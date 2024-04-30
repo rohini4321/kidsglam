@@ -24,7 +24,7 @@ const sendOTP = async (email, otp) => {
   const mailOptions = {
     from: process.env.GOOGLE_EMAIL,
     to: email,
-    subject: 'Your OTP is here',
+    subject: 'Your OTP ',
     text: `Your OTP is: ${otp}`
   };
 
