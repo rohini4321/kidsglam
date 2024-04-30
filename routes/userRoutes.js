@@ -13,6 +13,7 @@ user_route.get("/otpPage" , userController.loadotp);
 user_route.post('/verifyOtp', userController.verifyOtp);
 user_route.get('/otppage' , userController.verifyOtp);
 user_route.get("/login",userController.loadLoginPage);
+user_route.post('/resendOTP', userController.resendOTP);
  
 // user_route.get("/otpPage",userController.loadOtpPage);
 module.exports = user_route;

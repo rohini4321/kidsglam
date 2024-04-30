@@ -74,14 +74,15 @@
     </form>
     <p id="timer">Timer: 60 seconds</p>
     <p id="error-message"></p>
-    
 </div>
 
 <!-- Include SweetAlert JS -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.3/dist/sweetalert2.all.min.js"></script>
 <script>
-    let timerSeconds = 60;
+    let timerSeconds = 30;
+    let resendTimerSeconds = 30; // Resend timer duration in seconds
     let timerInterval;
+    let resendTimerInterval;
     let resendDisabled = true;
     let formSubmitted = false;
 
@@ -121,10 +122,10 @@
         const errorMessage = document.getElementById("error-message");
 
         // Check if the form has already been submitted
-        if (formSubmitted) {
-            errorMessage.innerText = "Form already submitted.";
-            return false;
-        }
+        // if (formSubmitted) {
+        //     errorMessage.innerText = "Form already submitted.";
+        //     return false;
+        // }
 
         // Check if OTP is empty
         if (otpInput.trim() === "") {
@@ -146,22 +147,62 @@
         return false; // Prevent default form submission
     }
 
+    // Function to handle resend button click
     function resendOtp() {
         if (!resendDisabled) {
-            // Logic to resend OTP
-            console.log("Resending OTP...");
+            // Logic to enable resend button only after the timer duration is over
             disableResendButton();
-            timerSeconds = 60;
-            startTimer();
-            enableSubmitButton();
-
-            // Use SweetAlert instead of default alert
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: 'Another OTP has been sent.'
+            startResendTimer();
+            // Send request to backend to resend OTP
+            fetch('/resendOTP', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: 'rohiniksabu@gmail.com' }) // Replace with actual email
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data.message);
+                // Use SweetAlert to display success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'OTP sent successfully'
+                });
+                // Enable the submit button after OTP is sent successfully
+                enableSubmitButton();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Use SweetAlert to display error message
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to resend OTP. Please try again later.'
+                });
             });
         }
+    }
+
+    // Function to start the resend timer
+    function startResendTimer() {
+        resendDisabled = true; // Disable resend button during the timer
+        resendTimerInterval = setInterval(() => {
+            resendTimerSeconds--;
+            // Update timer display
+            document.getElementById("timer").innerText = "Resend in: " + resendTimerSeconds + " seconds";
+            if (resendTimerSeconds <= 0) {
+                clearInterval(resendTimerInterval);
+                document.getElementById("timer").innerText = "Resend Now";
+                enableResendButton();
+            }
+        }, 1000);
     }
 
     function verifyOTP(otp) {

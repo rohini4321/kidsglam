@@ -53,6 +53,20 @@ const loadOtpPage = async (req, res) => {
   }
 };
 
+// In userController.js
+
+let resendTimer; // Timer variable
+
+// Function to start the resend timer
+const startResendTimer = () => {
+  resendTimer = setTimeout(() => {
+    // Generate and send a new OTP after the timer expires
+    const newOtp = generateOTP();
+    req.session.otp = newOtp;
+    sendOTP(email, newOtp);
+  }, 60000); // 60 seconds
+};
+
 // Function to resend OTP
 const resendOTP = async (req, res) => {
   try {
@@ -66,6 +80,10 @@ const resendOTP = async (req, res) => {
     req.session.otp = otp; // Update OTP in session securely
     await sendOTP(email, otp);
 
+    // Clear the previous timer and start a new one
+    clearTimeout(resendTimer);
+    startResendTimer();
+
     res.json({ message: 'OTP resent successfully' });
   } catch (error) {
     console.error('Error:', error.message);
@@ -73,12 +91,13 @@ const resendOTP = async (req, res) => {
   }
 };
 
+
 // Function to verify OTP
 const verifyOtp = async (req, res) => {
   const enteredOtp = req.body.enteredOtp;
   const storedOtp = req.session.otp;
-  console.log(enteredOtp);
-  console.log(storedOtp);
+  // console.log(enteredOtp);
+  // console.log(storedOtp);
 
   if (!enteredOtp) {
     res.status(400).json({ error: 'Entered OTP is missing in request body.' });
