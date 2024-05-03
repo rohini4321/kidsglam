@@ -79,7 +79,7 @@
 <!-- Include SweetAlert JS -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.3/dist/sweetalert2.all.min.js"></script>
 <script>
-    let timerSeconds = 30;
+    let timerSeconds = 60; // Corrected timer duration
     let resendTimerSeconds = 30; // Resend timer duration in seconds
     let timerInterval;
     let resendTimerInterval;
@@ -118,34 +118,32 @@
     }
 
     function validateForm() {
-        const otpInput = document.getElementById("otp-input").value;
-        const errorMessage = document.getElementById("error-message");
+    const otpInput = document.getElementById("otp-input").value;
+    const errorMessage = document.getElementById("error-message");
 
-        // Check if the form has already been submitted
-        // if (formSubmitted) {
-        //     errorMessage.innerText = "Form already submitted.";
-        //     return false;
-        // }
-
-        // Check if OTP is empty
-        if (otpInput.trim() === "") {
-            errorMessage.innerText = "Enter valid OTP";
-            return false;
-        }
-
-        // Check if OTP is not a 6-digit number
-        if (!/^\d{6}$/.test(otpInput)) {
-            errorMessage.innerText = "Invalid OTP";
-            return false;
-        }
-
-        // Clear error message if validation passes
-        errorMessage.innerText = "";
-        formSubmitted = true;
-        disableSubmitButton();
-        verifyOTP(otpInput);
-        return false; // Prevent default form submission
+    // Check if OTP is empty
+    if (otpInput.trim() === "") {
+        errorMessage.innerText = "Enter valid OTP";
+        enableSubmitButton(); // Enable submit button
+        return false;
     }
+
+    // Check if OTP is not a 6-digit number
+    if (!/^\d{6}$/.test(otpInput)) {
+        errorMessage.innerText = "Invalid OTP";
+        enableSubmitButton(); // Enable submit button
+        return false;
+    }
+
+    // Clear error message if validation passes
+    errorMessage.innerText = "";
+    formSubmitted = true;
+    enableSubmitButton();
+    verifyOTP(otpInput);
+    return false; // Prevent default form submission
+}
+
+
 
     // Function to handle resend button click
     function resendOtp() {

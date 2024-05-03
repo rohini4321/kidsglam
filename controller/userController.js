@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
 
 // Assuming you have environment variables set up for security
 const transporter = nodemailer.createTransport({
@@ -17,6 +18,17 @@ const generateOTP = () => {
     OTP += digits[Math.floor(Math.random() * 10)];
   }
   return OTP;
+};
+
+// Function to hash password using bcrypt
+const hashPassword = async (password) => {
+  const saltRounds = 10;
+  return await bcrypt.hash(password, saltRounds);
+};
+
+// Function to compare password with hashed password using bcrypt
+const comparePasswords = async (password, hashedPassword) => {
+  return await bcrypt.compare(password, hashedPassword);
 };
 
 // Function to send OTP via email
@@ -173,5 +185,7 @@ module.exports = {
   loadOtpPage ,
   verifyOtp,
   loadotp,
-  resendOTP
+  resendOTP,
+  hashPassword, // Export hashPassword function
+  comparePasswords // Export comparePasswords function
 };

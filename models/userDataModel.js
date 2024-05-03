@@ -3,7 +3,7 @@ const mongoose=require('mongoose')
 const Schema=mongoose.Schema
 
 const userSchema=Schema({
-    firstName:{
+    username:{
         type:String,
         required:true
     
@@ -12,10 +12,7 @@ const userSchema=Schema({
         type:String,
         required:true
     },
-    mobile:{
-        type:String,
-        required:true
-    },
+   
     password:{
         type:String,
         required:true
@@ -24,10 +21,7 @@ const userSchema=Schema({
         type:Number,
         default:0,
     
-    },
-        generatedTime:{
-            type:Date
-        
+   
     },
     isBlocked:{
         type:Boolean,
