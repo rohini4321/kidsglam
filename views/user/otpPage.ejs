@@ -119,6 +119,7 @@
 
     function validateForm() {
     const otpInput = document.getElementById("otp-input").value;
+    console.log(`enetered otp : ${otpInput }`)
     const errorMessage = document.getElementById("error-message");
 
     // Check if OTP is empty
@@ -220,7 +221,7 @@
         .then(data => {
             if (!data.error) {
                 // If OTP is correct, redirect to homepage
-                window.location.href = '/home';
+                window.location.href = '/login';
             }
         })
         .catch(error => {

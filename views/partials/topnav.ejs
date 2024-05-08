@@ -32,7 +32,11 @@
                                         <li><a href="#"><img src="userAssets/imgs/theme/flag-ru.png" alt="">Pусский</a></li>
                                     </ul>
                                 </li>
-                                <li><i class="fi-rs-user"></i><a href="page-login-register.html">Log In / Sign Up</a></li>
+                                <% if (username) { %>
+                                    <div>Welcome, <%= username %>!</div><a href="/logout">logout</a>
+                                  <% } else { %>
+                                    <div>Please <a href="/login">login</a> or <a href="/signup">signup</a></div>
+                                  <% } %>
                             </ul>
                         </div>
                     </div>

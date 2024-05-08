@@ -189,6 +189,11 @@
                                       <div class="form-group">
                                           <input required="" type="password" name="password" placeholder="Password">
                                       </div>
+                                      <!-- Error message display -->
+                    <% if (typeof message != 'undefined') { %>
+                      <p class="text-danger"><%= message %></p>
+                    <% } %>
+                    <!-- Remember me and forgot password -->
                                       <div class="login_footer form-group">
                                           <div class="chek-form">
                                               <div class="custome-checkbox">

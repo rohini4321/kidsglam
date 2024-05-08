@@ -1,0 +1,392 @@
+<%- include('../partials/adminheader.ejs') %> 
+
+<body>
+    <div class="screen-overlay"></div>
+    
+    <aside class="navbar-aside" id="offcanvas_aside">
+      <div class="aside-top">
+          <a href="index.html" class="brand-wrap">
+              <img src="/userAssets/imgs/theme/logo.png" class="logo" alt="Evara Dashboard">
+          </a>
+          <div>
+              <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
+          </div>
+      </div>
+      <nav>
+          <ul class="menu-aside">
+              <li class="menu-item active">
+                  <a class="menu-link" href="/admin/homePage2"> <i class="icon material-icons md-home"></i>
+                      <span class="text">Dashboard</span>
+                  </a>
+              </li>
+              <li class="menu-item ">
+                  <a class="menu-link" href="/admin/userManagement"> <i class="icon material-icons md-shopping_bag"></i>
+                      <span class="text">User Management</span>
+                  </a>
+                  
+              </li>
+              <li class="menu-item ">
+                  <a class="menu-link" href="/admin/categoryPage"> <i class="icon material-icons md-shopping_cart"></i>
+                      <span class="text">Categories</span>
+                  </a>
+                  
+              </li>
+              <li class="menu-item ">
+                  <a class="menu-link" href="/admin/productPage"> <i class="icon material-icons md-store"></i>
+                      <span class="text">Products</span>
+                  </a>
+                  
+              </li>
+              <li class="menu-item ">
+                  <a class="menu-link" href="/admin/orderPage"> <i class="icon material-icons md-add_box"></i>
+                      <span class="text">Orders</span>
+                  </a>
+                  
+              </li>
+              </ul>
+          </ul>
+          <br>
+          <br>
+      </nav>
+  </aside>
+
+    <main class="main-wrap">
+        <header class="main-header navbar">
+            <div class="col-search">
+                <form class="searchform">
+                    <div class="input-group">
+                        <input list="search_terms" type="text" class="form-control" placeholder="Search term">
+                        <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
+                    </div>
+                    <datalist id="search_terms">
+                        <option value="Products">
+                        <option value="New orders">
+                        <option value="Apple iphone">
+                        <option value="Ahmed Hassan">
+                    </datalist>
+                </form>
+            </div>
+            
+                 
+                    
+            </div>
+        </header>
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Categories </h2>
+                    <p>Add, edit or delete a category</p>
+                </div>
+                <div>
+                    <input type="text" placeholder="Search Categories" class="form-control bg-white">
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <form>
+                              <div class="col-md-15">
+                                <form method="post" action="/categoryPage">
+                                    <div class="mb-4">
+                                        <label for="product_name" class="form-label">Name</label>
+                                        <input type="text" placeholder="Type here" class="form-control" id="category_name" name="categoryName" />
+                                    </div>
+                                    <div class="d-grid">
+                                        <button id="createCategoryForm" type="submit" class="btn btn-primary">Create category</button>
+                                    </div>
+                                </form>
+                            </div>
+
+
+                        </div>
+                        <div class="col-md-9">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Name</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if(category.length > 0) { %>
+                                            <% for(let i = 0; i < category.length; i++) { %>
+                                                <tr>
+                                                    <td><%= i + 1 %></td>
+                                                    <td><%= category[i].categoryName %></td>
+                                                    <td>
+                                                        <% if(category[i].isUnlisted) { %>
+                                                            Unlisted
+                                                        <% } else { %>
+                                                            Active
+                                                        <% } %>
+                                                    </td>
+                                                    <td>
+                                                        <!-- Inside the loop where categories are displayed -->
+<button type="button" class="btn btn-primary" onclick="showEditModal('<%= category[i]._id %>', '<%= category[i].categoryName %>')">Edit</button>
+
+                                                    </td>
+                                                    <td>
+                                                        <% if(category[i].isUnlisted) { %>
+                                                            <button type="button" class="btn btn-success" onclick="confirmlist('<%= category[i]._id %>')">List</button>
+                                                        <% } else { %>
+                                                            <button type="button" class="btn btn-warning" onclick="confirmUnlist('<%= category[i]._id %>')">Unlist</button>
+                                                        <% } %>
+                                                    </td>
+                                                    
+                                                    <td>
+                                                        <button type="button" class="btn btn-danger" onclick="confirmDelete('<%= category[i]._id %>')">Delete</button>
+
+                                                    </td>
+                                                </tr>
+                                            <% } %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="6">Categories Not Found</td>
+                                            </tr>
+                                        <% } %>
+                                        
+                                       
+                                        
+
+
+
+
+
+                                    </tbody>
+                                    
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                                        <script>
+                                          // Add an event listener to the form submission event
+                                          document.getElementById('createCategoryForm').addEventListener('click', function(event) {
+                                              // Prevent the default form submission behavior
+                                              event.preventDefault();
+                                              
+                                              // Gather the category data from the form fields
+                                              const categoryName = document.getElementById('category_name').value;
+                                                console.log(categoryName);
+                                              // Send an HTTP POST request to your backend API endpoint
+                                              fetch('/admin/categoryPage', {
+                                                  method: 'POST',
+                                                  headers: {
+                                                      'Content-Type': 'application/json'
+                                                  },
+                                                  body: JSON.stringify({ categoryName: categoryName }) // Send category name in the request body
+                                              })
+                                              .then(response => {
+                                                  if (response.ok) {
+                                                      return response.json(); // Parse JSON response
+                                                      window.location.reload();
+                                                  }
+                                                  throw new Error('Failed to create category');
+                                              })
+                                              .then(data => {
+                                                  // Handle successful response (optional)
+                                                  console.log('Category created successfully:', data);
+                                                  // Optionally, display a success message or perform other actions
+                                                  window.location.reload(); // Reload the page
+                                              })
+                                              .catch(error => {
+                                                  // Handle errors
+                                                  console.error('Error creating category:', error);
+                                                  // Optionally, display an error message to the user
+                                              });
+                                          });
+
+                                        
+                                          
+    function confirmUnlist(categoryId) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Once unlisted, you will need to relist the category manually!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, unlist it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        }).then((result) => {
+            console.log(result.isConfirmed)
+            if (result.isConfirmed) {
+                // Perform the unlisting action here, for example, send an AJAX request to your backend
+                fetch(`/admin/listUser/${categoryId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ isUnlisted: true })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log("Category unlisted successfully");
+                        return response.json();
+                    } else {
+                        throw new Error("Failed to unlist category");
+                    }
+                })
+                .then(data => {
+                    console.log(data);
+                    Swal.fire("Unlisted!", "Your category has been unlisted.", "success");
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error("Error unlisting category:", error);
+                    Swal.fire("Error", "Failed to unlist the category. Please try again later.", "error");
+                });
+            } else {
+                Swal.fire("Cancelled", "Your category is safe :)", "error");
+            }
+        });
+    }
+
+
+    function confirmlist(categoryId) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Once listed, you will need to relist the category manually!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, list it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        }).then((result) => {
+            console.log(result.isConfirmed)
+            if (result.isConfirmed) {
+                // Perform the unlisting action here, for example, send an AJAX request to your backend
+                fetch(`/admin/unlistUser/${categoryId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ isUnlisted: false })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log("Category listed successfully");
+                        return response.json();
+                    } else {
+                        throw new Error("Failed to list category");
+                    }
+                })
+                .then(data => {
+                    console.log(data);
+                    Swal.fire("Unlisted!", "Your category has been listed.", "success");
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error("Error unlisting category:", error);
+                    Swal.fire("Error", "Failed to unlist the category. Please try again later.", "error");
+                });
+            } else {
+                Swal.fire("Cancelled", "Your category is safe :)", "error");
+            }
+        });
+    }
+
+    
+    function confirmDelete(categoryId) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this category!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Send an HTTP DELETE request to delete the category
+                fetch(`/admin/deletecategory/${categoryId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log("Category deleted successfully");
+                        return response.json();
+                    } else {
+                        throw new Error("Failed to delete category");
+                    }
+                })
+                .then(data => {
+                    console.log(data);
+                    Swal.fire("Deleted!", "Your category has been deleted.", "success");
+                    window.location.reload(); // Reload the page
+                })
+                .catch(error => {
+                    console.error("Error deleting category:", error);
+                    Swal.fire("Error", "Failed to delete the category. Please try again later.", "error");
+                });
+            } else {
+                Swal.fire("Cancelled", "Your category is safe :)", "error");
+            }
+        });
+    }
+
+
+    
+    function showEditModal(categoryId, currentName) {
+        Swal.fire({
+            title: 'Edit Category',
+            input: 'text',
+            inputValue: currentName,
+            inputAttributes: {
+                autocapitalize: 'off'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Save',
+            showLoaderOnConfirm: true,
+            preConfirm: (newName) => {
+                if (!newName) {
+                    Swal.showValidationMessage('Please enter a new name');
+                } else {
+                    // Send request to backend to update category name
+                    return fetch(`/admin/editcategory/${categoryId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ newName: newName })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to update category');
+                        }
+                        return response.json();
+                    })
+                    .catch(error => {
+                        Swal.showValidationMessage(`Request failed: ${error}`);
+                    });
+                }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire(
+                    'Saved!',
+                    'Category name has been updated.',
+                    'success'
+                );
+                // Reload the page or update UI as needed
+                window.location.reload();
+            }
+        });
+    }
+</script>
+
+
+
+
+
+
+</script>
