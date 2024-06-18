@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 mongoose.connect("mongodb://localhost:27017/kidsglam");
 const path = require('path')
-
+const nocache = require("nocache");
 const express = require("express");
 const session = require('express-session');
 const app = express(); // Create an instance of express
-
+app.use(nocache())
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your_very_strong_secret_key_here',
   resave: false,

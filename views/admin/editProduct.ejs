@@ -1,0 +1,182 @@
+<%- include('../partials/adminheader.ejs') %>
+<div class="screen-overlay"></div>
+
+<aside class="navbar-aside" id="offcanvas_aside">
+    <div class="aside-top">
+        <a href="index.html" class="brand-wrap">
+            <img src="/userAssets/imgs/theme/logo.png" class="logo" alt="Evara Dashboard">
+        </a>
+        <div>
+            <button class="btn btn-icon btn-aside-minimize"><i class="text-muted material-icons md-menu_open"></i></button>
+        </div>
+    </div>
+    <nav>
+        <ul class="menu-aside">
+            <li class="menu-item active">
+                <a class="menu-link" href="/admin/homePage2"><i class="icon material-icons md-home"></i>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" href="/admin/userManagement"><i class="icon material-icons md-shopping_bag"></i>
+                    <span class="text">User Management</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" href="/admin/categoryPage"><i class="icon material-icons md-shopping_cart"></i>
+                    <span class="text">Categories</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" href="/admin/productPage"><i class="icon material-icons md-store"></i>
+                    <span class="text">Products</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" href="/admin/orderPage"><i class="icon material-icons md-add_box"></i>
+                    <span class="text">Orders</span>
+                </a>
+            </li>
+        </ul>
+        <br>
+        <br>
+    </nav>
+</aside>
+
+<main class="main-wrap">
+    <section class="content-main">
+        <div class="row">
+            <div class="col-9">
+                <div class="content-header">
+                    <h2 class="content-title">Edit Products</h2>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="card mb-4">
+                    <form action="/admin/editproduct?id=<%= product._id %>" method="POST" enctype="multipart/form-data">
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <label for="product_title" class="form-label">Product title</label>
+                                <input type="text" placeholder="Type here" value="<%= product.productName %>" class="form-control" name="productName" id="product_title" required>
+                            </div>
+                            <div class="row gx-3">
+                                <div class="col-md-4 mb-3">
+                                    <label for="product_sku" class="form-label">Price</label>
+                                    <input type="text" placeholder="Type here" value="<%= product.price %>" name="price" class="form-control" id="product_sku" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="product_color" class="form-label">Stock</label>
+                                    <input type="text" name="stock" placeholder="Type here" value="<%= product.stock %>" class="form-control" id="product_color" required>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
+                                <select class="form-select" name="category">
+                                    <option selected>Select category</option>
+                                    <% categories.forEach((cat) => { %>
+                                        <option value="<%= cat._id %>" <%= product.category == cat._id ? 'selected' : '' %>><%= cat.categoryName %></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div>
+                                <label class="form-label">Description</label>
+                                <textarea name="description" placeholder="Type here" class="form-control" rows="4" required><%= product.description %></textarea>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div>
+                                <label class="form-label">Images</label>
+                                <input name="images" class="form-control" type="file" multiple onchange="previewImages(event)">
+                            </div>
+                            <div id="existing-images" style="margin-top: 10px; display: flex; flex-wrap: wrap;">
+                                <% product.image.forEach((image, index) => { %>
+                                    <div style="position: relative; display: inline-block; margin: 5px;">
+                                        <img src="/uploads/<%= image %>" alt="Product Image" style="max-width: 150px; max-height: 150px;">
+                                        <button type="button" class="btn btn-danger btn-sm" style="position: absolute; top: 0; right: 0;" onclick="deleteImage('<%= index %>', '<%= product._id %>', '<%= image %>')">&times;</button>
+                                        <input type="hidden" name="existingImages[]" value="<%= image %>">
+                                    </div>
+                                <% }) %>
+                            </div>
+                            <div id="image-preview" style="margin-top: 10px; display: flex; flex-wrap: wrap;"></div>
+                            <button type="submit" style="background-color: #4CAF50; color: white; border: none; border-radius: 5px; padding: 10px 20px; cursor: pointer; font-size: 16px;">Edit Product</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="adminAssets/js/vendors/jquery-3.6.0.min.js"></script>
+<script src="adminAssets/js/vendors/bootstrap.bundle.min.js"></script>
+<script src="adminAssets/js/vendors/select2.min.js"></script>
+<script src="adminAssets/js/vendors/perfect-scrollbar.js"></script>
+<script src="adminAssets/js/vendors/jquery.fullscreen.min.js"></script>
+<!-- Main Script -->
+<script src="adminAssets/js/main.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function previewImages(event) {
+        const imagePreview = document.getElementById('image-preview');
+        imagePreview.innerHTML = ''; // Clear any existing previews
+
+        const files = event.target.files;
+
+        if (files) {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = e.target.result;
+                    imgElement.style.maxWidth = '150px';
+                    imgElement.style.maxHeight = '150px';
+                    imgElement.style.margin = '5px';
+                    imagePreview.appendChild(imgElement);
+                }
+
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+
+    function deleteImage(index, productid, image) {
+        // Find the image div containing the image and the button
+        console.log(index, productid, "index of images");
+        const imageDiv = document.querySelector(`img[src="/uploads/${image}"]`).parentElement;
+        
+        // Remove the div from the DOM
+        imageDiv.remove();
+        
+        // Send a request to the backend to delete the image from the database
+        fetch('/admin/deleteimage', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ index, productid })
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('Image deleted successfully from the database.');
+            } else {
+                console.error('Failed to delete image from the database.');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting image:', error);
+        });
+
+        // Add a hidden input to mark the image for deletion on form submission
+        const form = document.querySelector('form');
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'deleteImages[]';
+        input.value = index;
+        form.appendChild(input);
+    }
+</script>

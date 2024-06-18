@@ -1,0 +1,153 @@
+<%- include('../partials/header.ejs') %>
+<%- include('../partials/topnav.ejs') %>
+
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> <a href="/shop">Shop</a>
+                <span></span> Product Detail
+            </div>
+        </div>
+    </div>
+    <section class="mt-50 mb-50">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="product-detail accordion-detail">
+                        <div class="row mb-50">
+                            <div class="col-md-6 col-sm-12 col-xs-12">
+                                <div class="detail-gallery">
+                                    <span class="zoom-icon"><i class="fi-rs-search"></i></span>
+                                    <div class="product-image-slider">
+                                        <img id="main-image" src="/uploads/<%= product.image[0] %>" alt="product image">
+                                    </div>
+                                    <div class="slider-nav-thumbnails-container">
+                                        <% for (let i = 0; i < product.image.length; i++) { %>
+                                            <div class="slider-nav-thumbnail">
+                                                <img src="/uploads/<%= product.image[i] %>" alt="product image" onclick="updateMainImage('/uploads/<%= product.image[i] %>')">
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                    <script>
+                                        function updateMainImage(src) {
+                                            const mainImage = document.getElementById('main-image');
+                                            mainImage.src = src;
+                                        }
+                                    </script>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12 col-xs-12">
+                                <div class="detail-info">
+                                    <h2 class="title-detail"><%= product.productName %></h2>
+                                    <div class="product-detail-rating">
+                                        <div class="pro-details-brand">
+                                            <span> Category: <a href="/shop?category=<%= product.category %>"><%= product.category %></a></span>
+                                        </div>
+                                        <div class="product-rate-cover text-end">
+                                            <div class="product-rate d-inline-block">
+                                                <div class="product-rating" style="width:90%"></div>
+                                            </div>
+                                            <span class="font-small ml-5 text-muted"> (25 reviews)</span>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix product-price-cover">
+                                        <div class="product-price primary-color float-left">
+                                            <span class="text-brand">Rs. <%= product.price %></span>
+                                        </div>
+                                    </div>
+                                    <div class="bt-1 border-color-1 mt-15 mb-15"></div>
+                                    <div class="short-desc mb-30">
+                                        <p><%= product.description %></p>
+                                    </div>
+                                    <div class="product_sort_info font-xs mb-30">
+                                        <ul>
+                                            <li class="mb-10"><i class="fi-rs-refresh mr-5"></i> 30 Day Return Policy</li>
+                                            <li><i class="fi-rs-credit-card mr-5"></i> Cash on Delivery available</li>
+                                        </ul>
+                                    </div>
+                                    <div class="social-icons single-share">
+                                        <ul class="text-grey-5 d-inline-block">
+                                            <li><strong class="mr-10">Share this:</strong></li>
+                                            <li class="social-facebook"><a href="#"><img src="userAssets/imgs/theme/icons/icon-facebook.svg" alt=""></a></li>
+                                            <li class="social-twitter"><a href="#"><img src="userAssets/imgs/theme/icons/icon-twitter.svg" alt=""></a></li>
+                                            <li class="social-instagram"><a href="#"><img src="userAssets/imgs/theme/icons/icon-instagram.svg" alt=""></a></li>
+                                            <li class="social-linkedin"><a href="#"><img src="userAssets/imgs/theme/icons/icon-pinterest.svg" alt=""></a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="product-buttons mt-30">
+                                        <button class="btn btn-primary" onclick="addToCart('<%= product.id %>')">Add to Cart</button>
+                                        <button class="btn btn-secondary" onclick="buyNow('<%= product.id %>')">Buy Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Additional product details could go here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<%- include('../partials/bottomnav.ejs') %>
+<%- include('../partials/footer.ejs') %>
+
+<style>
+.slider-nav-thumbnails-container {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-top: 15px;
+}
+
+.slider-nav-thumbnail img {
+    max-width: 80px;
+    height: auto;
+    display: block;
+    border-radius: 10px;
+    border: none; /* Remove the border */
+}
+
+.product-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-primary:hover, .btn-secondary:hover {
+    opacity: 0.8;
+}
+</style>
+
+<script>
+function addToCart(productId) {
+    // Implement add to cart functionality
+    alert('Product ' + productId + ' added to cart');
+}
+
+function buyNow(productId) {
+    // Implement buy now functionality
+    alert('Proceeding to buy product ' + productId);
+}
+</script>

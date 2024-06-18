@@ -1,0 +1,282 @@
+<%- include('../partials/header.ejs') %>
+<%- include('../partials/topnav.ejs') %>
+
+<style>
+    body {
+        background-color: #f0f8ff; /* Light blue background for the body */
+        color: #333;
+    }
+    .breadcrumb-wrap {
+        background-color: #e6f7ff; /* Light blue background for the breadcrumb */
+    }
+    .card {
+        border: 1px solid #d1e7ff; /* Light blue border for the card */
+        background-color: #ffffff; /* White background for the card */
+    }
+    .card-header {
+        background-color: #d1e7ff; /* Light blue background for the card header */
+        border-bottom: 1px solid #b6e0fe; /* Light blue border for the card header */
+    }
+    .card-body {
+        padding: 20px;
+    }
+    .btn-fill-out {
+        background-color: #007bff; /* Blue background for buttons */
+        color: white;
+        border: none;
+    }
+    .btn-fill-out:hover {
+        background-color: #0056b3; /* Darker blue background for hover */
+        color: white;
+    }
+    .mobile-header-wrapper-style {
+        background-color: #e6f7ff; /* Light blue background for the mobile header */
+    }
+    .mobile-header-content-area {
+        background-color: #f0f8ff; /* Light blue background for the mobile content area */
+    }
+    .mobile-header-border {
+        border-color: #d1e7ff; /* Light blue borders */
+    }
+    .main-content {
+        display: flex;
+    }
+    .main-content .content-area {
+        flex: 1;
+    }
+</style>
+
+<div class="mobile-header-active mobile-header-wrapper-style">
+    <div class="mobile-header-wrapper-inner">
+        <div class="mobile-header-top">
+            <div class="mobile-header-logo">
+                <a href="index.html"><img src="userAssets/imgs/theme/logo.svg" alt="logo"></a>
+            </div>
+            <div class="mobile-menu-close close-style-wrap close-style-position-inherit">
+                <button class="close-style search-close">
+                    <i class="icon-top"></i>
+                    <i class="icon-bottom"></i>
+                </button>
+            </div>
+        </div>
+        <div class="mobile-header-content-area">
+            <div class="mobile-search search-style-3 mobile-header-border">
+                <form action="#">
+                    <input type="text" placeholder="Search for items…">
+                    <button type="submit"><i class="fi-rs-search"></i></button>
+                </form>
+            </div>
+            <div class="mobile-menu-wrap mobile-header-border">
+                <div class="main-categori-wrap mobile-header-border">
+                    <a class="categori-button-active-2" href="#">
+                        <span class="fi-rs-apps"></span> Browse Categories
+                    </a>
+                    <div class="categori-dropdown-wrap categori-dropdown-active-small">
+                        <!-- Categories go here -->
+                    </div>
+                </div>
+                <!-- mobile menu start -->
+                <nav>
+                    <!-- Navigation goes here -->
+                </nav>
+                <!-- mobile menu end -->
+            </div>
+            <div class="mobile-header-info-wrap mobile-header-border">
+                <div class="single-mobile-header-info mt-30">
+                    <a href="page-contact.html">Our location</a>
+                </div>
+                <div class="single-mobile-header-info">
+                    <a href="page-login-register.html">Log In / Sign Up</a>
+                </div>
+                <div class="single-mobile-header-info">
+                    <a href="#">(+01) - 2345 - 6789</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Pages
+                <span></span> Account
+            </div>
+        </div>
+    </div>
+    <section class="pt-150 pb-150">
+        <div class="container">
+            <div class="main-content">
+                <%- include('../partials/sidebar.ejs') %>
+                <div class="content-area">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="mb-30">Edit Account Details</h3>
+                                </div>
+                                
+                                <div class="card-body">
+                                   
+                                    <form id="edit-profile-form" method="post">
+                                        <div class="row">
+                                          <div class="form-group col-md-12">
+                                            <label> Username <span class="required">*</span></label>
+                                            <!-- Populate with user's username -->
+                                            <input required class="form-control" name="username" type="text" value="<%= user.username %>">
+                                          </div>
+                                          <div class="form-group col-md-12">
+                                            <label>Email Address <span class="required">*</span></label>
+                                            <!-- Populate with user's email -->
+                                            <input required class="form-control" name="email" type="email" value="<%= user.email %>">
+                                          </div>
+                                          <div class="col-md-12">
+                                            <button type="submit" class="btn btn-fill-out submit" name="submit" value="Submit">Save</button>
+                                          </div>
+                                        </div>
+                                      </form>
+                                      
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="mb-30">Reset Password</h3>
+                                </div>
+                                <div class="card-body">
+                                    <form id="reset-password-form" method="post" name="reset-password">
+                                        <div class="row">
+                                            <div class="form-group col-md-12">
+                                                <label>Current Password <span class="required">*</span></label>
+                                                <input required class="form-control" name="current_password" type="password">
+                                            </div>
+                                            <div class="form-group col-md-12">
+                                                <label>New Password <span class="required">*</span></label>
+                                                <input required class="form-control" name="new_password" type="password">
+                                            </div>
+                                            <div class="form-group col-md-12">
+                                                <label>Confirm Password <span class="required">*</span></label>
+                                                <input required class="form-control" name="confirm_password" type="password">
+                                            </div>
+                                            <div class="col-md-12">
+                                                <button type="submit" class="btn btn-fill-out submit" name="submit" value="Submit">Save</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- .row -->
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<%- include('../partials/bottomnav.ejs') %>
+<%- include('../partials/footer.ejs') %>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('edit-profile-form');
+  
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    
+    const formData = new FormData(form);
+    const data = {
+      username: formData.get('username'),
+      email: formData.get('email')
+    };
+
+    try {
+      const response = await fetch('/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        console.log("hello")
+        // Handle successful response
+        window.location.href = '/profilePage'; // Redirect to profile page
+      } else {
+        // Handle errors
+        const errorText = await response.text();
+        console.error('Error:', errorText);
+        alert('Error updating profile. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error updating profile. Please try again.');
+    }
+  });
+});
+
+
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('reset-password-form');
+  
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+  
+        const formData = new FormData(form);
+        const data = {
+          current_password: formData.get('current_password'),
+          new_password: formData.get('new_password'),
+          confirm_password: formData.get('confirm_password')
+        };
+  
+        try {
+          const response = await fetch('/resetPassword', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          });
+  
+          if (response.ok) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Password Updated',
+              text: 'Your password has been updated successfully!',
+              confirmButtonText: 'OK'
+            }).then(() => {
+              window.location.href = '/resetAddress';
+            });
+          } else {
+            const errorText = await response.text();
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: errorText,
+              confirmButtonText: 'OK'
+            });
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while updating your password. Please try again.',
+            confirmButtonText: 'OK'
+          });
+        }
+      });
+    });
+  </script>

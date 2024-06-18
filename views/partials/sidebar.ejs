@@ -1,0 +1,78 @@
+<aside class="account-sidebar">
+  <nav class="account-nav">
+      <ul>
+          <li><a href="profilePage" class="nav-item details"><i class="fi-rs-user"></i> Account Details</a></li>
+          <li><a href="resetAddress" class="nav-item address"><i class="fi-rs-marker"></i> My Address</a></li>
+          <li><a href="orderPage" class="nav-item orders"><i class="fi-rs-shopping-bag"></i> Orders</a></li>
+          <li><a href="wallet.html" class="nav-item wallet"><i class="fi-rs-wallet"></i> Wallet</a></li>
+          <li><a href="logout.html" class="nav-item logout"><i class="fi-rs-sign-out"></i> Logout</a></li>
+      </ul>
+  </nav>
+</aside>
+
+<style>
+  .account-sidebar {
+      background-color: #f0f8ff; /* Light blue background for the sidebar */
+      padding: 30px;
+      border: 1px solid #d1e7ff;
+      margin-bottom: 20px;
+      width: 250px;
+      border-radius: 10px; /* Rounded corners for a softer look */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a slight shadow for depth */
+  }
+  .account-nav ul {
+      list-style: none;
+      padding: 0;
+  }
+  .account-nav li {
+      margin-bottom: 15px;
+  }
+  .account-nav a {
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      padding: 10px 15px;
+      border-radius: 5px; /* Rounded corners for links */
+      transition: background-color 0.3s, color 0.3s; /* Smooth transitions */
+  }
+  .account-nav a i {
+      margin-right: 10px;
+  }
+  .account-nav a.details {
+      color: #ffffff;
+      background-color: #007bff; /* Blue background for Account Details */
+  }
+  .account-nav a.details:hover {
+      background-color: #0056b3; /* Darker blue on hover */
+  }
+  .account-nav a.address {
+      color: #ffffff;
+      background-color: #28a745; /* Green background for My Address */
+  }
+  .account-nav a.address:hover {
+      background-color: #1c7430; /* Darker green on hover */
+  }
+  .account-nav a.orders {
+      color: #ffffff;
+      background-color: #ffc107; /* Yellow background for Orders */
+  }
+  .account-nav a.orders:hover {
+      background-color: #e0a800; /* Darker yellow on hover */
+  }
+  .account-nav a.wallet {
+      color: #ffffff;
+      background-color: #17a2b8; /* Teal background for Wallet */
+  }
+  .account-nav a.wallet:hover {
+      background-color: #117a8b; /* Darker teal on hover */
+  }
+  .account-nav a.logout {
+      color: #ffffff;
+      background-color: #dc3545; /* Red background for Logout */
+  }
+  .account-nav a.logout:hover {
+      background-color: #c82333; /* Darker red on hover */
+  }
+</style>

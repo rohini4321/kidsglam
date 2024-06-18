@@ -1,0 +1,391 @@
+<%- include('../partials/header.ejs') %>
+<%- include('../partials/topnav.ejs') %>
+
+<style>
+    .main-content {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .content-area {
+        flex: 1;
+        margin-left: 20px; /* Ensure some space between sidebar and content area */
+    }
+    .card {
+        border: 1px solid #d1e7ff;
+        background-color: #ffffff;
+        margin-bottom: 20px; /* Space between cards */
+    }
+    .card-header {
+        background-color: #d1e7ff;
+        border-bottom: 1px solid #b6e0fe;
+        padding: 10px; /* Adjust padding */
+    }
+    .card-body {
+        padding: 15px; /* Adjust padding */
+    }
+    .btn-fill-out {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px; /* Adjust button padding */
+        margin-top: 10px; /* Space above the button */
+        margin-bottom: 20px; /* Space below the button */
+    }
+    .btn-fill-out:hover {
+        background-color: #0056b3;
+        color: white;
+    }
+    .address-box {
+        display: flex;
+        flex-direction: column;
+        padding: 5px; /* Reduce padding */
+        border: 1px solid #d1e7ff;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+    }
+    .address-header {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .address-details {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .address-text {
+        flex-grow: 1;
+    }
+    .address-actions {
+        margin-left: 10px;
+    }
+    .btn-edit, .btn-delete {
+        background-color: #ffc107;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        margin-left: 5px;
+    }
+    .btn-edit:hover {
+        background-color: #e0a800;
+    }
+    .btn-delete {
+        background-color: #dc3545;
+    }
+    .btn-delete:hover {
+        background-color: #c82333;
+    }
+</style>
+
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Pages
+                <span></span> Profile
+            </div>
+        </div>
+    </div>
+    <section class="pt-150 pb-150">
+        <div class="container">
+            <div class="main-content">
+                <%- include('../partials/sidebar.ejs') %>
+                <div class="content-area">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button id="add-new-address" class="btn btn-fill-out">Add New Address</button>
+                        </div>
+                        <div class="col-md-12" id="address-container">
+                            <% user.address.forEach((user, index) => { %>
+                                <div class="address-box" data-address-id="<%= index %>">
+                                  <div class="address-header">
+                                    <h4>Address <%= index + 1 %></h4>
+                                  </div>
+                                  <div class="address-details">
+                                    <div class="address-text">
+                                      <p><%= user.StreetName %>, <%= user.City %>, <%= user.Landmark %>, <%= user.Pincode %>, <%= user.Country %></p>
+                                    </div>
+                                    <div class="address-actions">
+                                        <button class="btn btn-edit" data-address-id="<%= index %>">Edit</button>
+ 
+                                      <button class="btn btn-delete">Delete</button>
+                                    </div>
+                                  </div>
+                                </div>
+                              <% }) %>
+                        </div>
+                    </div> <!-- .row -->
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Modal for adding new address -->
+<div id="new-address-modal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Address</h5>
+                
+            </div>
+            <div class="modal-body">
+                <form id="new-address-form">
+                    <div class="form-group">
+                        <label>Street Name <span class="required">*</span></label>
+                        <input  class="form-control" name="street_name" type="text">
+                    </div>
+                    <div class="form-group">
+                        <label>City<span class="required">*</span></label>
+                        <input  class="form-control" name="city" type="text">
+                    </div>
+                    <div class="form-group">
+                        <label>Landmark <span class="required">*</span></label>
+                        <input required class="form-control" name="landmark" type="text">
+                    </div>
+                    <div class="form-group">
+                        <label>Pincode<span class="required">*</span></label>
+                        <input required class="form-control" name="pincode" type="text">
+                    </div>
+                    <div class="form-group">
+                        <label>Country<span class="required">*</span></label>
+                        <input required class="form-control" name="country" type="text">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-fill-out" id="save-address">Save</button>
+                <button type="button" class="btn btn-secondary" id="cancel-address">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/bottomnav.ejs') %>
+<%- include('../partials/footer.ejs') %>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const newAddressButton = document.getElementById('add-new-address');
+    const newAddressModal = document.getElementById('new-address-modal');
+    const saveAddressButton = document.getElementById('save-address');
+    const cancelAddressButton = document.getElementById('cancel-address');
+    const newAddressForm = document.getElementById('new-address-form');
+
+    newAddressButton.addEventListener('click', () => {
+        $(newAddressModal).modal('show');
+    });
+
+    cancelAddressButton.addEventListener('click', () => {
+        $(newAddressModal).modal('hide');
+    });
+
+    saveAddressButton.addEventListener('click', async () => {
+        const formData = new FormData(newAddressForm);
+        const data = {
+            StreetName: formData.get('street_name'),
+            City: formData.get('city'),
+            Landmark: formData.get('landmark'),
+            Pincode: formData.get('pincode'),
+            Country: formData.get('country')
+        };
+
+        try {
+            const response = await fetch('/addaddress', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Address Added',
+                    text: 'Your new address has been added successfully!',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    window.location.reload(); // Reload the page to show the new address
+                });
+            } else {
+                const errorText = await response.text();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Tg Error',
+                    text: errorText,
+                    confirmButtonText: 'OK'
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred while adding your address. Please try again.',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
+});
+
+
+
+const deleteButtons = document.querySelectorAll('.btn-delete');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', async (event) => {
+            const addressBox = event.target.closest('.address-box');
+            const addressId = addressBox.dataset.addressId;
+            console.log("theaddress",addressId)
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`/deleteAddress/${addressId}`, {
+                            method: 'DELETE'
+                        });
+
+                        if (response.ok) {
+                            Swal.fire(
+                                'Deleted!',
+                                'The address has been deleted.',
+                                'success'
+                            ).then(() => {
+                                addressBox.remove(); // Remove the address box from the UI
+                            });
+                        } else {
+                            const errorText = await response.text();
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: errorText,
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while deleting the address. Please try again.',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                }
+            });
+        });
+    });
+
+
+
+    const editButtons = document.querySelectorAll('.btn-edit');
+    editButtons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            const addressBox = event.target.closest('.address-box');
+            const addressId = addressBox.dataset.addressId;
+            const addressData = {
+                street_name: addressBox.querySelector('.address-text').textContent.split(',')[0].trim(),
+                city: addressBox.querySelector('.address-text').textContent.split(',')[1].trim(),
+                landmark: addressBox.querySelector('.address-text').textContent.split(',')[2].trim(),
+                pincode: addressBox.querySelector('.address-text').textContent.split(',')[3].trim(),
+                country: addressBox.querySelector('.address-text').textContent.split(',')[4].trim()
+            };
+
+            Swal.fire({
+                title: 'Edit Address',
+                html: `
+                    <form id="edit-address-form">
+                        <div class="form-group">
+                            <label>Street Name <span class="required">*</span></label>
+                            <input class="form-control" name="street_name" type="text" value="${addressData.street_name}">
+                        </div>
+                        <div class="form-group">
+                            <label>City<span class="required">*</span></label>
+                            <input class="form-control" name="city" type="text" value="${addressData.city}">
+                        </div>
+                        <div class="form-group">
+                            <label>Landmark <span class="required">*</span></label>
+                            <input class="form-control" name="landmark" type="text" value="${addressData.landmark}">
+                        </div>
+                        <div class="form-group">
+                            <label>Pincode<span class="required">*</span></label>
+                            <input class="form-control" name="pincode" type="text" value="${addressData.pincode}">
+                        </div>
+                        <div class="form-group">
+                            <label>Country<span class="required">*</span></label>
+                            <input class="form-control" name="country" type="text" value="${addressData.country}">
+                        </div>
+                    </form>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Save',
+                preConfirm: () => {
+                    const form = document.getElementById('edit-address-form');
+                    const formData = new FormData(form);
+                    return {
+                        street_name: formData.get('street_name'),
+                        city: formData.get('city'),
+                        landmark: formData.get('landmark'),
+                        pincode: formData.get('pincode'),
+                        country: formData.get('country')
+                    };
+                }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const data = result.value;
+
+                    try {
+                        const response = await fetch(`/editAddress/${addressId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        });
+
+                        if (response.ok) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Address Updated',
+                                text: 'The address has been updated successfully!',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                // Update the UI
+                                addressBox.querySelector('.address-text').innerHTML = `
+                                    ${data.street_name}, ${data.city}, ${data.landmark}, ${data.pincode}, ${data.country}
+                                `;
+                            });
+                        } else {
+                            const errorText = await response.text();
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: errorText,
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while updating the address. Please try again.',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                }
+            });
+        });
+    });
+
+
+</script>

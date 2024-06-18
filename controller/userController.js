@@ -1,6 +1,9 @@
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const User = require("../models/userDataModel")
+const Category = require("../models/categoryModel")
+const Product = require("../models/productDataModel")
+
 // Assuming you have environment variables set up for security
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -26,13 +29,13 @@ const hashPassword = async (password) => {
   return await bcrypt.hash(password, saltRounds);
 };
 
-// Function to compare password with hashed password using bcrypt
+
 const comparePasswords = async (password, hashedPassword) => {
   return await bcrypt.compare(password, hashedPassword);
 };
 
 // Function to send OTP via email
-const sendOTP = async (email, otp) => {
+const sendMail = async (email, otp) => {
   const mailOptions = {
     from: process.env.GOOGLE_EMAIL,
     to: email,
@@ -44,9 +47,8 @@ const sendOTP = async (email, otp) => {
 };
 
 // Function to load OTP page
-const loadOtpPage = async (req, res) => {
+const  sendOtp = async (req, res) => {
   try {
-    // const email = req.body.email;
     const{username,email,password}=req.body;
     const user ={username,email,password}
     req.session.user= user;
@@ -57,9 +59,10 @@ const loadOtpPage = async (req, res) => {
 
     const otp = generateOTP();
     console.log(otp);
-    req.session.otp = otp; // Store OTP in session securely 
+    req.session.otp = otp;
 
-    await sendOTP(email, otp);
+    await sendMail(email, otp);
+
 
     res.redirect('/otpPage');
   } catch (error) {
@@ -68,18 +71,16 @@ const loadOtpPage = async (req, res) => {
   }
 };
 
-// In userController.js
 
-let resendTimer; // Timer variable
 
-// Function to start the resend timer
+let resendTimer; 
 const startResendTimer = () => {
   resendTimer = setTimeout(() => {
-    // Generate and send a new OTP after the timer expires
     const newOtp = generateOTP();
+    console.log(newOtp);
     req.session.otp = newOtp;
-    sendOTP(email, newOtp);
-  }, 60000); // 60 seconds
+    sendMail(email, newOtp);
+  }, 60000);
 };
 
 // Function to resend OTP
@@ -92,10 +93,9 @@ const resendOTP = async (req, res) => {
     }
 
     const otp = generateOTP();
-    req.session.otp = otp; // Update OTP in session securely
-    await sendOTP(email, otp);
+    req.session.otp = otp;
+    await sendMail(email, otp);
 
-    // Clear the previous timer and start a new one
     clearTimeout(resendTimer);
     startResendTimer();
 
@@ -105,80 +105,6 @@ const resendOTP = async (req, res) => {
     res.status(500).send(error.message);
   }
 };
-
-
-
-// // Function to verify OTP
-// const verifyOtp = async (req, res) => {
-//   const enteredOtp = req.body.enteredOtp;
-//   const storedOtp = req.session.otp;
- 
-
-
-//   try {
-//     // Entered OTP is incorrect
-//     if (enteredOtp !== storedOtp) {
-//       res.status(400).json({ error: 'Invalid OTP' });
-//       return;
-//     }
-//      const userData=req.session.user
-//      const passwordHash = await securePassword(userData.password)
-
-
-
-//      const saveUserData = new User({
-//       name: userData.name,
-//       email: userData.email,
-//       phone: userData.phone,
-//       password: passwordHash
-      
-//   })
-//   // OTP verified successfully
-//   delete req.session.otp;
-//   await saveUserData.save()  
-//   res.redirect("/login")
-    
-//     // Send redirect URL to the client
-//     // res.json({ redirectURL: '/homepage' }); // Change '/homepage' to the actual URL of your homepage
-// }catch (error) {
-//     console.error('Error:', error.message);
-//     res.status(500).send(error.message);
-//   }
-// }
-
-
-
-const verifyLogin = async (req, res) => {
-  const username = req.session.userName;
- 
-  try {
-    const {email , password}=req.body;
-    const findUser = await User.findOne({ isAdmin: "0", email: email });
-    console.log(findUser);
- 
-  if (findUser) {
-        const passwordMatch = await bcrypt.compare(password, findUser.password);
-        if (passwordMatch) {
-          req.session.user = findUser._id;
-          req.session.userName = findUser.username;
-
-          //  const {username} =req.session.username
-          res.redirect("/" );
-        } else {
-          console.log("Password is not matching");
-          res.render("loginPage", { username: findUser.name,message: "Password is not matching" });
-        } 
-    } else {
-      console.log("User is not found");
-      res.render("loginPage", { username: username ,message: "Invalid email or password" });
-    }
-  } catch (error) {
-    res.redirect("/pageNotFound");
-    res.render("loginPage", { username: username,message: "Invalid email or password" });
-  }
-};
-
-
 
 const verifyOtp = async (req, res) => {
   const enteredOtp =parseInt(req.body.enteredOtp);
@@ -198,38 +124,53 @@ const verifyOtp = async (req, res) => {
       password: passwordHash
     });
 
-    // Save user data to the database
     await saveUserData.save();
-
-    // Redirect to the login page after successful registration
-    // res.redirect("/login");
     res.status(200).json({ message: 'User registered successfully' });
   } catch (error) {
     console.error('this Error:', error.message);
     res.status(500).send(error.message);
   }
 };
-
-
-
-
-  // Function to load home page
-const loadHomePage = async (req, res) => {
+  
+const verifyLogin = async (req, res) => {
   try {
-   
-   const username = req.session.userName;
-    // Fetch the username from the session
-    // const { username } = req.session.user
-    console.log('username : ',req.session.userName)
-   
-    res.render("homePage", { username});
+    const {email , password}=req.body;
+    const findUser = await User.findOne({ isAdmin: "0", email: email });
+ 
+  if (findUser) {
+        const passwordMatch = await bcrypt.compare(password, findUser.password);
+        if (passwordMatch) {
+          req.session.user = findUser._id;
+          req.session.userName = findUser.username;
+          res.redirect("/");   
+        } else {
+          res.render("loginPage", { username: findUser.name,message: "Password is not matching" });
+        } 
+    } else {
+      console.log("User is not found");
+      res.render("loginPage", { username: "" ,message: "Invalid email or password" });
+    }
   } catch (error) {
-    console.log('Error loading home page:', error.message);
-    res.status(500).send('Error loading home page. Please try again later.', error);
+    res.redirect("/pageNotFound");
+    res.render("loginPage", { username: "",message: "Invalid email or password" });
   }
 };
 
-
+// Function to load home page
+const loadHomePage = async (req, res) => {
+  try {
+   const user = await User.findById(req.session.user)
+    let username;
+   if (user) {
+     username = user.username;
+  } else {
+    username = '';
+  }
+   res.render("homePage", { username});
+  } catch (error) {
+    console.log('Error loading home page:', error.message);
+  }
+};
 
 // Function to load sign up page
 const loadSignUpPage = async (req, res) => {
@@ -241,20 +182,19 @@ const loadSignUpPage = async (req, res) => {
     res.status(500).send('Error loading sign up page. Please try again later.');
   }
 };
-
-
+ 
 // Function to load login page
 const loadLoginPage = async (req, res) => {
   try {
     const username = req.session.user;
-    res.render("loginPage" , {username});
+    res.render("loginPage" , {username : ''});
   } catch (error) {
     console.log('Error loading login page:', error.message);
     res.status(500).send('Error loading login page. Please try again later.');
   }
 };
 
-const loadotp  = async(req,res)=>{
+const loadotpPage = async(req,res)=>{
   try {
     res.render("otpPage")
   } catch (error) {
@@ -267,7 +207,6 @@ const userlogout = async(req,res)=>{
   {
      req.session.user=null;
      req.session.userName=null;
-
      res.redirect('/');
   }catch(error){
     console.log(error.message);
@@ -275,16 +214,75 @@ const userlogout = async(req,res)=>{
 }
 
 
+
+const loadShopPage = async (req, res) => {
+  try {
+    let username;
+    const user = await User.findById(req.session.user)
+   if (user) {
+     username = user.username;
+  } else {
+    username = '';
+  }
+    const category = await Category.find({isUnlisted : false});
+    const Products = await Product.find()
+    
+    res.render("ShoppingPage",{username,category,product:Products});
+  } catch (error) {
+    console.log('Error loading shopping page:', error.message);
+    res.status(500).send('Error loading shopping page. Please try again later.', error);
+  }
+};
+
+
+const loadSinglePage = async (req, res) => {
+  try {
+
+    const username = req.session.userName
+    const email = req.session.email
+    res.render("singleProduct",{username,email});
+  } catch (error) {
+    console.log('Error single shopping page:', error.message);
+    res.status(500).send('Error single shopping page. Please try again later.', error);
+  }
+};
+
+
+
+const getSingleProduct = async (req, res) => {
+  try {
+    const username = req.session.userName;
+    const productId = req.query.id; 
+
+    // Fetch product details from the database based on productId
+    const product = await Product.findById(productId);
+
+    // Render the single product page template with product details
+    res.render('single_product', { username, product });
+  } catch (error) {
+    console.error('Error fetching product details:', error.message);
+    res.status(500).send('Error fetching product details. Please try again later.');
+  }
+};
+
+
+
+
+
+
 module.exports = {
   loadHomePage,
   loadSignUpPage,
   loadLoginPage,
-  loadOtpPage ,
+  sendOtp ,
   verifyOtp,
-  loadotp,
+  loadotpPage,
   resendOTP,
-  hashPassword, // Export hashPassword function
+  hashPassword, 
   comparePasswords,
   verifyLogin,
-  userlogout// Export comparePasswords function
+  userlogout,
+  loadShopPage,
+  loadSinglePage,
+  getSingleProduct
 };

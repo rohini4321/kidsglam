@@ -17,6 +17,13 @@ admin_route.put('/unlistUser/:categoryId',adminController.unlistcategory)
 admin_route.delete('/deletecategory/:categoryId', adminController.deleteCategory);
 admin_route.put('/editcategory/:categoryId', adminController.editCategory);
 admin_route.get('/addProduct', adminController.addProduct);
-admin_route.get('/addProduct',adminController.getCategories);
+admin_route.post('/addProduct', adminController.productController);
+admin_route.delete('/deleteproduct/:productId',adminController.deleteProduct);
+admin_route.get('/editproduct',adminController.loadEditProduct);
+admin_route.post('/editproduct',adminController.editProduct);
+
+admin_route.post('/deleteimage', adminController.deleteImage)
+
+
 
 module.exports=admin_route;

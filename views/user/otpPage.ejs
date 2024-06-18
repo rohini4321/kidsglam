@@ -118,47 +118,43 @@
     }
 
     function validateForm() {
-    const otpInput = document.getElementById("otp-input").value;
-    console.log(`enetered otp : ${otpInput }`)
-    const errorMessage = document.getElementById("error-message");
+        const otpInput = document.getElementById("otp-input").value;
+        console.log(`enetered otp : ${otpInput }`)
+        const errorMessage = document.getElementById("error-message");
 
-    // Check if OTP is empty
-    if (otpInput.trim() === "") {
-        errorMessage.innerText = "Enter valid OTP";
-        enableSubmitButton(); // Enable submit button
+        // Check if OTP is empty
+        if (otpInput.trim() === "") {
+            errorMessage.innerText = "Enter valid OTP";
+            enableSubmitButton();
+            return false;
+        }
+
+        // Check if OTP is not a 6-digit number
+        if (!/^\d{6}$/.test(otpInput)) {
+            errorMessage.innerText = "Invalid OTP";
+            enableSubmitButton();
+            return false;
+        }
+
+        // Clear error message if validation passes
+        errorMessage.innerText = "";
+        formSubmitted = true;
+        enableSubmitButton();
+        verifyOTP(otpInput);
         return false;
     }
-
-    // Check if OTP is not a 6-digit number
-    if (!/^\d{6}$/.test(otpInput)) {
-        errorMessage.innerText = "Invalid OTP";
-        enableSubmitButton(); // Enable submit button
-        return false;
-    }
-
-    // Clear error message if validation passes
-    errorMessage.innerText = "";
-    formSubmitted = true;
-    enableSubmitButton();
-    verifyOTP(otpInput);
-    return false; // Prevent default form submission
-}
-
-
 
     // Function to handle resend button click
     function resendOtp() {
         if (!resendDisabled) {
-            // Logic to enable resend button only after the timer duration is over
             disableResendButton();
             startResendTimer();
-            // Send request to backend to resend OTP
             fetch('/resendOTP', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ email: 'rohiniksabu@gmail.com' }) // Replace with actual email
+                // body: JSON.stringify({ email: 'rohiniksabu@gmail.com' })
             })
             .then(response => {
                 if (!response.ok) {
@@ -167,19 +163,15 @@
                 return response.json();
             })
             .then(data => {
-                console.log(data.message);
-                // Use SweetAlert to display success message
                 Swal.fire({
                     icon: 'success',
                     title: 'Success',
                     text: 'OTP sent successfully'
                 });
-                // Enable the submit button after OTP is sent successfully
                 enableSubmitButton();
             })
             .catch(error => {
                 console.error('Error:', error);
-                // Use SweetAlert to display error message
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -191,10 +183,9 @@
 
     // Function to start the resend timer
     function startResendTimer() {
-        resendDisabled = true; // Disable resend button during the timer
+        resendDisabled = true;
         resendTimerInterval = setInterval(() => {
             resendTimerSeconds--;
-            // Update timer display
             document.getElementById("timer").innerText = "Resend in: " + resendTimerSeconds + " seconds";
             if (resendTimerSeconds <= 0) {
                 clearInterval(resendTimerInterval);
@@ -220,7 +211,6 @@
         })
         .then(data => {
             if (!data.error) {
-                // If OTP is correct, redirect to homepage
                 window.location.href = '/login';
             }
         })
@@ -230,7 +220,6 @@
         });
     }
 
-    // Start timer when the page loads
     startTimer();
 
 </script>

@@ -31,7 +31,26 @@ const userSchema=Schema({
         type:Date,
         default:Date.now
     },
-    
+    address:[{
+        StreetName: {
+            type: String,
+        },
+        City: {
+          type:String,
+        },
+        Landmark:{
+            type:String,
+        },
+        Pincode:{
+            type:Number,
+        },
+        Country:{
+            type:String
+        }}
+        
+        
+    ],
+        
     
 })
 
