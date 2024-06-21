@@ -46,120 +46,70 @@
     }
 </style>
 
-<div class="mobile-header-active mobile-header-wrapper-style">
-    <div class="mobile-header-wrapper-inner">
-        <div class="mobile-header-top">
-            <div class="mobile-header-logo">
-                <a href="index.html"><img src="userAssets/imgs/theme/logo.svg" alt="logo"></a>
-            </div>
-            <div class="mobile-menu-close close-style-wrap close-style-position-inherit">
-                <button class="close-style search-close">
-                    <i class="icon-top"></i>
-                    <i class="icon-bottom"></i>
-                </button>
-            </div>
-        </div>
-        <div class="mobile-header-content-area">
-            <div class="mobile-search search-style-3 mobile-header-border">
-                <form action="#">
-                    <input type="text" placeholder="Search for items…">
-                    <button type="submit"><i class="fi-rs-search"></i></button>
-                </form>
-            </div>
-            <div class="mobile-menu-wrap mobile-header-border">
-                <div class="main-categori-wrap mobile-header-border">
-                    <a class="categori-button-active-2" href="#">
-                        <span class="fi-rs-apps"></span> Browse Categories
-                    </a>
-                    <div class="categori-dropdown-wrap categori-dropdown-active-small">
-                        <!-- Categories go here -->
-                    </div>
-                </div>
-                <!-- mobile menu start -->
-                <nav>
-                    <!-- Navigation goes here -->
-                </nav>
-                <!-- mobile menu end -->
-            </div>
-            <div class="mobile-header-info-wrap mobile-header-border">
-                <div class="single-mobile-header-info mt-30">
-                    <a href="page-contact.html">Our location</a>
-                </div>
-                <div class="single-mobile-header-info">
-                    <a href="page-login-register.html">Log In / Sign Up</a>
-                </div>
-                <div class="single-mobile-header-info">
-                    <a href="#">(+01) - 2345 - 6789</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Add your custom CSS styles here -->
 
 <main class="main">
-    <div class="page-header breadcrumb-wrap">
-        <div class="container">
-            <div class="breadcrumb">
-                <a href="index.html" rel="nofollow">Home</a>
-                <span></span> Pages
-                <span></span> Account
-            </div>
-        </div>
+  <div class="page-header breadcrumb-wrap">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="index.html" rel="nofollow">Home</a>
+        <span></span> Pages
+        <span></span> Account
+      </div>
     </div>
-    <section class="pt-150 pb-150">
-        <div class="container">
-            <div class="main-content">
-                <%- include('../partials/sidebar.ejs') %>
-                <div class="content-area">
-                    <div class="tab-pane fade show active" id="orders" role="tabpanel" aria-labelledby="orders-tab">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Your Orders</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Order</th>
-                                                <th>Date</th>
-                                                <th>Status</th>
-                                                <th>Total</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>#1357</td>
-                                                <td>March 45, 2020</td>
-                                                <td>Processing</td>
-                                                <td>$125.00 for 2 item</td>
-                                                <td><a href="#" class="btn-small d-block">View</a></td>
-                                            </tr>
-                                            <tr>
-                                                <td>#2468</td>
-                                                <td>June 29, 2020</td>
-                                                <td>Completed</td>
-                                                <td>$364.00 for 5 item</td>
-                                                <td><a href="#" class="btn-small d-block">View</a></td>
-                                            </tr>
-                                            <tr>
-                                                <td>#2366</td>
-                                                <td>August 02, 2020</td>
-                                                <td>Completed</td>
-                                                <td>$280.00 for 3 item</td>
-                                                <td><a href="#" class="btn-small d-block">View</a></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+  </div>
+
+  <section class="pt-150 pb-150">
+    <div class="container">
+      <div class="main-content">
+        <% include('../partials/sidebar.ejs') %>
+        <div class="content-area">
+          <div class="tab-pane fade show active" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">Your Orders</h5>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Order</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% if (order && order.length > 0) { %>
+                        <% order.forEach(orderItem => { %>
+                          <% orderItem.products.forEach(product => { %>
+                            <tr>
+                              <td>#<%= orderItem._id %></td>
+                              <td><%= new Date(orderItem.createdOn).toDateString() %></td>
+                              <td><%= product.productStatus %></td>
+                              <td>$<%= product.price %> for <%= product.quantity %> item(s)</td>
+                              <td><a href="#" class="btn-small d-block">View</a></td>
+                            </tr>
+                          <% }); %>
+                        <% }); %>
+                      <% } else { %>
+                        <tr>
+                          <td colspan="5">No orders found.</td>
+                        </tr>
+                      <% } %>
+                    </tbody>
+                  </table>
                 </div>
+              </div>
             </div>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
+
 </main>
 
 <%- include('../partials/bottomnav.ejs') %>

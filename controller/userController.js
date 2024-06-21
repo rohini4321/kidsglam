@@ -4,7 +4,7 @@ const User = require("../models/userDataModel")
 const Category = require("../models/categoryModel")
 const Product = require("../models/productDataModel")
 
-// Assuming you have environment variables set up for security
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -232,7 +232,7 @@ const loadShopPage = async (req, res) => {
     console.log('Error loading shopping page:', error.message);
     res.status(500).send('Error loading shopping page. Please try again later.', error);
   }
-};
+}; 
 
 
 const loadSinglePage = async (req, res) => {

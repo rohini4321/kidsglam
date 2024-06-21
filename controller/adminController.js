@@ -6,7 +6,7 @@ const multer = require("multer")
 const path = require('path');
 const sharp = require('sharp');
 const fs = require('fs')
-
+const Order = require ("../models/orderModel")
 // Function to load home page
 const loadloginpage = async (req, res) => {
   try {
@@ -168,15 +168,16 @@ const loadProductPage = async (req, res) => {
   }
 };
 
-const loadOrderPage = async (req, res) => {
-  try {
-    res.render("orderPage");
+// const loadOrderPage = async (req, res) => {
+//   try {
+//     res.render("orderManagement",{username:""});
    
-  } catch (error) {
-    console.log('Error loading home page:', error.message);
-    res.status(500).send('Error loading home page. Please try again later.');
-  }
-};
+//   } catch (error) {
+//     console.log('Error loading home page:', error.message);
+//     res.status(500).send('Error loading order page.');
+//   }
+// };
+
 
 
 const listcategory = async (req, res) => {
@@ -203,6 +204,25 @@ const listcategory = async (req, res) => {
   } catch (error) {
       console.error('Error unlisting category:', error);
       res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+
+
+
+const loadOrderPage = async (req, res) => {
+  try {
+    // Fetch all orders from the database
+    const orders = await Order.find().populate('products.productId').exec();
+
+    const user = await Order.find().populate('userID').exec();
+    
+    // Render the orderPage EJS template with orders data
+    res.render('orderManagement', { orders ,username:"",user}); // Pass the 'orders' variable to the EJS template
+  } catch (error) {
+    console.error('Error loading order page:', error);
+    res.status(500).send('Server error');
   }
 };
 

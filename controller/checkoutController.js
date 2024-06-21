@@ -1,6 +1,7 @@
 const User = require("../models/userDataModel");
 const Cart = require("../models/cartModel")
 const Products = require("../models/productDataModel")
+const Order = require("../models/orderModel")
 const loadCheckoutPage = async (req, res) => {
   try {
 
@@ -113,44 +114,229 @@ const addAddress = async (req, res) => {
 };
 
 
-const checkAvailability = async (req, res) => {
+// const checkAvailability = async (req, res) => {
+//   try {
+//       const { selectedAddress } = req.body;
+//       const products = req.session.cart; // Assuming you have a cart stored in session
+
+//       for (let item of products) {
+//           const product = await Product.findById(item.productId);
+//           if (!product || product.stock < item.quantity) {
+//               return res.json({ success: false, message: 'Out of stock' });
+//           }
+//       }
+
+//       // Proceed to create order
+//       const order = new Order({
+//           user: req.user._id,
+//           address: selectedAddress,
+//           products: products.map(item => ({
+//               product: item.productId,
+//               quantity: item.quantity
+//           })),
+//           total: products.reduce((sum, item) => sum + item.productId.price * item.quantity, 0)
+//       });
+
+//       await order.save();
+
+//       // Clear the cart
+//       req.session.cart = [];
+
+//       res.json({ success: true, orderId: order._id });
+//   } catch (error) {
+//       console.error(error);
+//       res.json({ success: false, message: 'An error occurred' });
+//   }
+// };
+
+
+const checkStock = async (req, res) => {
+  const { orderDetails } = req.body;
+  
   try {
-      const { selectedAddress } = req.body;
-      const products = req.session.cart; // Assuming you have a cart stored in session
-
-      for (let item of products) {
-          const product = await Product.findById(item.productId);
-          if (!product || product.stock < item.quantity) {
-              return res.json({ success: false, message: 'Out of stock' });
-          }
+    const productIds = orderDetails.map(item => item.productId);
+    const products = await Products.find({ _id: { $in: productIds } });
+    
+    let allInStock = true;
+    let outOfStockItems = [];
+    
+    orderDetails.forEach(item => {
+      const product = products.find(p => p._id.toString() === item.productId);
+      if (!product || product.stock < item.quantity) {
+        allInStock = false;
+        outOfStockItems.push({ productId: item.productId, availableStock: product ? product.stock : 0 });
       }
+    });
 
-      // Proceed to create order
-      const order = new Order({
-          user: req.user._id,
-          address: selectedAddress,
-          products: products.map(item => ({
-              product: item.productId,
-              quantity: item.quantity
-          })),
-          total: products.reduce((sum, item) => sum + item.productId.price * item.quantity, 0)
-      });
-
-      await order.save();
-
-      // Clear the cart
-      req.session.cart = [];
-
-      res.json({ success: true, orderId: order._id });
+    if (allInStock) {
+      return res.json({ success: true, message: 'All items are in stock' });
+    } else {
+      return res.json({ success: false, message: 'Some items are out of stock', outOfStockItems });
+    } 
   } catch (error) {
-      console.error(error);
-      res.json({ success: false, message: 'An error occurred' });
+    console.error('Error checking stock:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
-module.exports = {
+
+
+
+
+
+
+
+
+
+
+const placeOrder = async (req, res) => {
+  const { user, address, orderDetails, paymentMethod, billTotal, discount, subTotal } = req.body;
+
+  try {
+    // Create products array for the order
+    const products = orderDetails.map(item => ({
+      productId: item.productId,
+      productPrice: item.productPrice,
+      productName: item.productName,
+      media: item.media,
+      quantity: item.quantity,
+      price: item.price,
+      subtotal: item.subtotal,
+      cancelProduct: false,
+      cancelReason: "",
+      returnProduct: false,
+      returnReason: "",
+      productStatus: "pending"
+    }));
+
+    // Create new order object
+    const newOrder = new Order({
+      user: req.session.user,
+      products,
+      orderStatus: "pending",
+      billTotal,
+      discount,
+      subTotal,
+      address: address,
+      paymentMethod,
+      createdOn: new Date(),
+      showDate: new Date().toLocaleDateString(),
+      cancelAll: false,
+      cancelReason: "",
+      returnAll: false,
+      returnReason: ""
+    });
+
+    // Save the order to the database
+    await newOrder.save();
+
+    // Update stock quantities in products collection
+    for (const item of orderDetails) {
+      await Products.updateOne(
+        { _id: item.productId },
+        { $inc: { stock: -item.quantity } }
+      );
+    }
+
+    return res.json({ success: true, message: 'Order placed successfully' });
+  } catch (error) {
+    console.error('Error placing order:', error);
+    return res.status(500).json({ success: false, message: 'Failed to place order' });
+  }
+};
+
+
+
+
+
+
+
+
+
+const getAddressDetails = async (req, res) => {
+  try {
+      const userId = req.session.user;
+      const addressId = req.params.id;
+
+      // Find the user by their ID
+      const user = await User.findById(userId);
+
+      if (!user) {
+          return res.json({ success: false, message: 'User not found' });
+      }
+
+      // Find the address by its ID within the user's addresses
+      const address = user.address.id(addressId);
+      console.log("addressjjjjjjjjjjjjjjjjj",address)
+
+      if (address) {
+          res.json({ success: true, address });
+      } else {
+          res.json({ success: false, message: 'Address not found' });
+      }
+  } catch (error) {
+      console.error('Error fetching address details:', error);
+      res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const getCartDetails = async (req, res) => {
+  try {
+      const userId = req.session.user; 
+      console.log("User ID:", userId);
+
+      const cartItems = await Cart.find({ userID: userId }).populate('products.productId'); 
+      console.log("Cart Items:", cartItems);
+
+      // Collect all products from cart items
+      const products = cartItems.flatMap(cartItem => cartItem.products);
+      console.log("Products:", products);
+
+      res.json({ success: true, cartItems: products });
+  } catch (error) {
+      console.error('Error fetching cart details:', error);
+      res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+
+
+
+ 
+
+
+
+
+
+
+  module.exports = {
   loadCheckoutPage,
   updateAddress,
   addAddress,
-  checkAvailability
+  checkStock,
+  placeOrder,
+ getCartDetails ,
+ getAddressDetails
+  
 };
  

@@ -330,7 +330,99 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
-
-
-
+<script>
+    document.getElementById('place-order-btn').addEventListener('click', function() {
+        const selectedAddressId = document.querySelector('input[name="selectedAddress"]:checked').value;
+    
+        // Fetch cart details from the backend
+        fetch('/getCartDetails', {
+            method: 'POST',
+        })
+        .then(response => response.json())
+        .then(cartData => {
+            if (cartData.success) {
+                // Flatten the products into orderDetails
+                const orderDetails = cartData.cartItems.map(product => {
+                    if (!product.productId || !product.productId._id) {
+                        throw new Error(`Invalid productId in product: ${JSON.stringify(product)}`);
+                    }
+                    return {
+                        productId: product.productId._id,
+                        quantity: product.quantity
+                    };
+                });
+    
+                // Fetch the selected address details
+                return fetch(`/getAddressDetails/${selectedAddressId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(addressData => {
+                    if (addressData.success) {
+                        const address = addressData.address;
+    
+                        // Send a request to check stock availability
+                        return fetch('/checkStock', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ orderDetails })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Stock is available, proceed with placing the order
+                                return fetch('/placeOrder', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        address: address,
+                                        orderDetails: orderDetails,
+                                        paymentMethod: document.querySelector('input[name="payment_option"]:checked').id
+                                    })
+                                });
+                            } else {
+                                throw new Error(data.message || 'Stock is not available');
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(orderData => {
+                            if (orderData.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Order Placed',
+                                    text: 'Your order has been placed successfully!',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.href = '/orderPage';
+                                });
+                            } else {
+                                throw new Error(orderData.message || 'Failed to place order');
+                            }
+                        });
+                    } else {
+                        throw new Error('Failed to fetch address details');
+                    }
+                });
+            } else {
+                throw new Error('Failed to fetch cart details');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Failed to process your request. Please try again.',
+            });
+        });
+    });
+    </script>
+    

@@ -44,5 +44,8 @@ user_route.get('/checkoutPage',checkoutController.loadCheckoutPage);
 user_route.put('/address/:id', checkoutController. updateAddress)
 user_route.post("/addaddress/:id",checkoutController.addAddress)
 user_route.get("/orderPage", orderController.loadOrderPage)
-user_route.post("/checkavAvailability",checkoutController.checkAvailability)
+user_route.post("/checkStock",checkoutController.checkStock)
+ user_route.post("/placeOrder",checkoutController.placeOrder)
+user_route.post("/getCartDetails",checkoutController. getCartDetails)
+user_route.get('/getAddressDetails/:id',checkoutController.getAddressDetails)
 module.exports = user_route;
