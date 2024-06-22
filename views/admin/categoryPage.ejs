@@ -158,44 +158,59 @@
 
                                     </tbody>
                                     
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                                        <script>
-                                          // Add an event listener to the form submission event
-                                          document.getElementById('createCategoryForm').addEventListener('click', function(event) {
-                                              // Prevent the default form submission behavior
-                                              event.preventDefault();
-                                              
-                                              // Gather the category data from the form fields
-                                              const categoryName = document.getElementById('category_name').value;
-                                                console.log(categoryName);
-                                              // Send an HTTP POST request to your backend API endpoint
-                                              fetch('/admin/categoryPage', {
-                                                  method: 'POST',
-                                                  headers: {
-                                                      'Content-Type': 'application/json'
-                                                  },
-                                                  body: JSON.stringify({ categoryName: categoryName }) // Send category name in the request body
-                                              })
-                                              .then(response => {
-                                                  if (response.ok) {
-                                                      return response.json(); // Parse JSON response
-                                                      window.location.reload();
-                                                  }
-                                                  throw new Error('Failed to create category');
-                                              })
-                                              .then(data => {
-                                                  // Handle successful response (optional)
-                                                  console.log('Category created successfully:', data);
-                                                  // Optionally, display a success message or perform other actions
-                                                  window.location.reload(); // Reload the page
-                                              })
-                                              .catch(error => {
-                                                  // Handle errors
-                                                  console.error('Error creating category:', error);
-                                                  // Optionally, display an error message to the user
-                                              });
+                                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                                    <script>
+                                      // Add an event listener to the form submission event
+                                      document.getElementById('createCategoryForm').addEventListener('click', function(event) {
+                                        // Prevent the default form submission behavior
+                                        event.preventDefault();
+                                        
+                                        // Gather the category data from the form fields
+                                        const categoryName = document.getElementById('category_name').value;
+                                        console.log(categoryName);
+                                    
+                                        // Send an HTTP POST request to your backend API endpoint
+                                        fetch('/admin/categoryPage', {
+                                          method: 'POST',
+                                          headers: {
+                                            'Content-Type': 'application/json'
+                                          },
+                                          body: JSON.stringify({ categoryName: categoryName }) // Send category name in the request body
+                                        })
+                                        .then(response => {
+                                          if (response.ok) {
+                                            return response.json(); // Parse JSON response
+                                          } else if (response.status === 400) {
+                                            throw new Error('Category already exists');
+                                          } else {
+                                            throw new Error('Failed to create category');
+                                          }
+                                        })
+                                        .then(data => {
+                                          // Handle successful response
+                                          console.log('Category created successfully:', data);
+                                          Swal.fire({
+                                            title: 'Success!',
+                                            text: 'Category created successfully.',
+                                            icon: 'success',
+                                            confirmButtonText: 'OK'
+                                          }).then(() => {
+                                            window.location.reload(); // Reload the page
                                           });
-
+                                        })
+                                        .catch(error => {
+                                          // Handle errors
+                                          console.error('Error creating category:', error);
+                                          Swal.fire({
+                                            title: 'Error',
+                                            text: error.message,
+                                            icon: 'error',
+                                            confirmButtonText: 'OK'
+                                          });
+                                        });
+                                      });
+                                    
+                                    
                                         
                                           
     function confirmUnlist(categoryId) {

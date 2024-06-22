@@ -12,28 +12,25 @@
         </div>
         <nav>
             <ul class="menu-aside">
-                <li class="menu-item ">
+                <li class="menu-item">
                     <a class="menu-link" href="/admin/homePage2"> <i class="icon material-icons md-home"></i>
                         <span class="text">Dashboard</span>
                     </a>
                 </li>
-                <li class="menu-item ">
+                <li class="menu-item">
                     <a class="menu-link" href="/admin/userManagement"> <i class="icon material-icons md-shopping_bag"></i>
                         <span class="text">User Management</span>
                     </a>
-                    
                 </li>
-                <li class="menu-item ">
+                <li class="menu-item">
                     <a class="menu-link" href="/admin/categoryPage"> <i class="icon material-icons md-shopping_cart"></i>
                         <span class="text">Categories</span>
                     </a>
-                    
                 </li>
-                <li class="menu-item ">
+                <li class="menu-item">
                     <a class="menu-link" href="/admin/productPage"> <i class="icon material-icons md-store"></i>
                         <span class="text">Products</span>
                     </a>
-                    
                 </li>
                 <li class="menu-item active">
                     <a class="menu-link" href="/admin/orderPage"> <i class="icon material-icons md-add_box"></i>
@@ -41,128 +38,179 @@
                     </a>
                 </li>
             </ul>
-            </ul>
             <br>
             <br>
         </nav>
     </aside>
-<main class="main-wrap">
-    <section class="content-main">
-        <div class="content-header">
-            <div>
-                <h2 class="content-title card-title">Order List</h2>
-                <p>Lorem ipsum dolor sit amet.</p>
+    <main class="main-wrap">
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Order List</h2>
+                    <p>Lorem ipsum dolor sit amet.</p>
+                </div>
+                <div>
+                    <input type="text" placeholder="Search order ID" class="form-control bg-white">
+                </div>
             </div>
-            <div>
-                <input type="text" placeholder="Search order ID" class="form-control bg-white">
-            </div>
-        </div>
-        <div class="card mb-4">
-            <header class="card-header">
-                <div class="row gx-3">
-                    <div class="col-lg-4 col-md-6 me-auto">
-                        <input type="text" placeholder="Search..." class="form-control">
+            <div class="card mb-4">
+                <header class="card-header">
+                    <div class="row gx-3">
+                        <div class="col-lg-4 col-md-6 me-auto">
+                            <input type="text" placeholder="Search..." class="form-control">
+                        </div>
+                        <div class="col-lg-2 col-6 col-md-3">
+                            <select class="form-select">
+                                <option>Status</option>
+                                <option>Active</option>
+                                <option>Disabled</option>
+                                <option>Show all</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-6 col-md-3">
+                            <select class="form-select">
+                                <option>Show 20</option>
+                                <option>Show 30</option>
+                                <option>Show 40</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="col-lg-2 col-6 col-md-3">
-                        <select class="form-select">
-                            <option>Status</option>
-                            <option>Active</option>
-                            <option>Disabled</option>
-                            <option>Show all</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-6 col-md-3">
-                        <select class="form-select">
-                            <option>Show 20</option>
-                            <option>Show 30</option>
-                            <option>Show 40</option>
-                        </select>
+                </header>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Order ID</th>
+                                    <th>Products Name</th>
+                                    <th>Image</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Product Price</th>
+                                    <th>Quantity</th>
+                                    <th>Subtotal</th>
+                                    <th>Grand Total</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% orders.forEach((order, index) => { %>
+                                    <tr>
+                                        <td><%= index + 1 %></td>
+                                        <td><%= order._id %></td>
+                                        <td>
+                                            <% order.products.forEach((product, idx) => { %>
+                                                <%= product.productName %><br>
+                                            <% }); %>
+                                        </td>
+                                        <td>
+                                            <% order.products.forEach((product, idx) => { %>
+                                                <img src="/uploads/<%= product.productId.image %>" alt="<%= product.productId.productName %>" width="50">
+                                            <% }); %>
+                                        </td>
+                                        <td><%= new Date(order.createdOn).toDateString() %></td>
+                                        <td id="status-<%= order._id %>"><%= order.orderStatus %></td>
+                                        <td>
+                                            <% let totalPrice = 0; %>
+                                            <% order.products.forEach((product, idx) => { %>
+                                                <%= product.price %><br>
+                                                <% totalPrice += product.price; %>
+                                            <% }); %>
+                                        </td>
+                                        <td>
+                                            <% order.products.forEach((product, idx) => { %>
+                                                <%= product.quantity %><br>
+                                            <% }); %>
+                                        </td>
+                                        <td>
+                                            <% order.products.forEach((product, idx) => { %>
+                                                <%= product.subtotal %><br>
+                                            <% }); %>
+                                        </td>
+                                        <td><%= order.billTotal %></td>
+                                        <td class="text-end">
+                                            <button class="btn btn-light rounded btn-sm change-status-btn" data-order-id="<%= order._id %>">
+                                                Change Status
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            </header> <!-- card-header end// -->
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>#ID</th>
-                                <th scope="col">Order ID</th>
-                                <th scope="col">Products Name</th>
-                                <th scope="col">User</th>
-                                <th scope="col">Total</th>
-                                <th scope="col">Payment Method</th>
-                                <th scope="col">Order Status</th>
-                                <th scope="col">Order Date</th>
-                                <th scope="col" class="text-end">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% orders.forEach((order, index) => { %>
-                                <tr>
-                                    <td><%= index + 1 %></td>
-                                    <td><%= order._id %></td>
-                                    <td>
-                                        <% order.products.forEach(product => { %>
-                                            <%= product.productId.productName %> (Qty: <%= product.quantity %>)<br>
-                                        <% }) %>
-                                    </td>
-                                    <td>
-                                        <%= order.userID ? order.userID.username : 'Unknown' %>
-                                    </td>
-                                    <td>
-                                        <% if (order.total !== undefined) { %>
-                                            $<%= order.total.toFixed(2) %>
-                                        <% } else { %>
-                                            N/A
-                                        <% } %>
-                                    </td>
-                                    <td><%= order.paymentMethod %></td>
-                                    <td>
-                                        <span class="badge rounded-pill
-                                            <% if (order.status === 'Pending') { %>
-                                                alert-warning
-                                            <% } else if (order.status === 'Completed') { %>
-                                                alert-success
-                                            <% } else { %>
-                                                alert-danger
-                                            <% } %>">
-                                            <%= order.status %>
-                                        </span>
-                                    </td>
-                                    <td><%= new Date(order.orderDate).toLocaleDateString() %></td>
-                                    <td class="text-end">
-                                        <a href="#" class="btn btn-md rounded font-sm">Detail</a>
-                                        <div class="dropdown">
-                                            <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
-                                                <i class="material-icons md-more_horiz"></i>
-                                            </a>
-                                            <div class="dropdown-menu">
-                                                <a class="dropdown-item" href="#">View detail</a>
-                                                <a class="dropdown-item" href="#">Edit info</a>
-                                                <a class="dropdown-item text-danger" href="#">Delete</a>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <% }) %>
-                        </tbody>
-                    </table>
-                </div> <!-- table-responsive //end -->
-            </div> <!-- card-body end// -->
-        </div> <!-- card end// -->
-        <div class="pagination-area mt-15 mb-50">
-            <nav aria-label="Page navigation example">
-                <ul class="pagination justify-content-start">
-                    <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                    <li class="page-item"><a class="page-link" href="#">02</a></li>
-                    <li class="page-item"><a class="page-link" href="#">03</a></li>
-                    <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                    <li class="page-item"><a class="page-link" href="#">16</a></li>
-                    <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
-                </ul>
-            </nav>
-        </div>
-    </section> <!-- content-main end// -->
-</main>
-
+            </div>
+            <div class="pagination-area mt-15 mb-50">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                        <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                        <li class="page-item"><a class="page-link" href="#">02</a></li>
+                        <li class="page-item"><a class="page-link" href="#">03</a></li>
+                        <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                        <li class="page-item"><a class="page-link" href="#">16</a></li>
+                        <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+                    </ul>
+                </nav>
+            </div>
+        </section>
+    </main>
 <%- include('../partials/footer.ejs') %>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const changeStatusButtons = document.querySelectorAll('.change-status-btn');
+
+    changeStatusButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const orderId = this.getAttribute('data-order-id');
+
+            Swal.fire({
+                title: 'Change Order Status',
+                input: 'select',
+                inputOptions: {
+                    'Pending': 'Pending',
+                    'Shipped': 'Shipped',
+                    'Delivered': 'Delivered'
+                },
+                inputPlaceholder: 'Select a status',
+                showCancelButton: true,
+                inputValidator: (value) => {
+                    return new Promise((resolve) => {
+                        if (value) {
+                            resolve()
+                        } else {
+                            resolve('You need to select a status')
+                        }
+                    })
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const status = result.value;
+                    fetch(`/admin/changestatus/${orderId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ status })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById(`status-${orderId}`).innerText = status;
+                            Swal.fire('Success', 'Order status updated', 'success');
+                        } else {
+                            Swal.fire('Error', 'Failed to update order status', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', 'Failed to update order status', 'error');
+                    });
+                }
+            });
+        });
+    });
+});
+</script>

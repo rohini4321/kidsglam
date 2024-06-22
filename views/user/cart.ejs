@@ -16,6 +16,8 @@
             <div class="row">
                 <div class="col-12">
                     <div class="table-responsive">
+                        <% if (products.length > 0) { %>
+                        
                         <table class="table shopping-summery text-center clean">
                             <thead>
                                 <tr class="main-heading">
@@ -28,7 +30,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% if (products.length > 0) { %>
                                     <% products.forEach(product => { %>
                                     <tr>
                                         <td class="image product-thumbnail"><img src="/uploads/<%= product.productId.image[0] %>" alt="<%= product.productName %>" style="max-width: 100px;"></td>
@@ -49,24 +50,24 @@
                                         </td>
                                     </tr>
                                     <% }) %>
-                                <% } else { %>
-                                    <tr>
-                                        <td colspan="6" class="text-center">Your cart is empty.</td>
-                                    </tr>
-                                <% } %>
+                                
                                 <tr>
                                     <td colspan="6" class="text-end">
                                         <a href="#" class="text-muted"> <i class="fi-rs-cross-small"></i> Clear Cart</a>
                                     </td>
                                 </tr>
+                                
                             </tbody>
                         </table>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="6" class="text-center">Your cart is empty.</td>
+                            </tr>
+                        <% } %>
                     </div>
-                    <div class="cart-action text-end">
-                        <a class="btn mr-10 mb-sm-15"><i class="fi-rs-shuffle mr-10"></i>Update Cart</a>
-                        <a class="btn"><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
-                    </div>
+                    
                     <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
+                    <% if (products.length > 0) { %>
                     <div class="row mb-50">
                         <div class="col-lg-6 col-md-12">
                             <div class="border p-md-4 p-30 border-radius cart-totals">
@@ -92,12 +93,12 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    
                                 </div>
                                 <a href="/checkoutPage" class="btn"><i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
                             </div>
                         </div>
                     </div>
+                    <% } %>
                 </div>
             </div>
         </div>
@@ -239,6 +240,9 @@
                         'The product has been removed from your cart.',
                         'success'
                     );
+                    if (document.querySelectorAll('tbody tr').length === 1) {
+                        location.reload();
+                    }
                 } else {
                     Swal.fire(
                         'Failed!',
@@ -256,4 +260,3 @@
     });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-     

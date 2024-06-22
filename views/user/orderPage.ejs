@@ -75,29 +75,73 @@
                     <thead>
                       <tr>
                         <th>Order</th>
+                        <th>Product Name</th>
+                        <th>Image</th>
                         <th>Date</th>
                         <th>Status</th>
-                        <th>Total</th>
+                        <th>Product Price</th>
+                        <th>Quantity</th>
+                        <th>Sub Total</th>
+                        <th>Grand Total</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       <% if (order && order.length > 0) { %>
-                        <% order.forEach(orderItem => { %>
-                          <% orderItem.products.forEach(product => { %>
-                            <tr>
-                              <td>#<%= orderItem._id %></td>
-                              <td><%= new Date(orderItem.createdOn).toDateString() %></td>
-                              <td><%= product.productStatus %></td>
-                              <td>$<%= product.price %> for <%= product.quantity %> item(s)</td>
-                              <td><a href="#" class="btn-small d-block">View</a></td>
-                            </tr>
+                          <% order.forEach((orderItem, index) => { %>
+                              <tr>
+                                  <td><%=orderItem.orderId%></td> <!-- Generating a unique order number -->
+                                  <td>
+                                    <ol>
+                                      <% orderItem.products.forEach((product, i) => { %>
+                                        <li><%= i + 1 %>. <%= product.productName %></li>
+                                      <% }); %>
+                                    </ol>
+                                  </td>
+                                  <td class="image product-thumbnail">
+                                    <ol>
+                                      <% orderItem.products.forEach((product) => { %>
+                                        <li>
+                                          <% if (product.image && product.image.length > 0) { %>
+                                            <img src="/uploads/<%= product.image[0] %>" alt="<%= product.productName %>" width="50" height="50">
+                                          <% } else { %>
+                                            <span>No image</span>
+                                          <% } %>
+                                        </li>
+                                      <% }); %>
+                                    </ol>
+                                  </td>
+                                  <td><%= orderItem.createdOn.toDateString() %></td>
+                                  <td><%= orderItem.orderStatus %></td>
+                                  <td>
+                                    <ol>
+                                      <% orderItem.products.forEach((product) => { %>
+                                        <li><%= product.price %></li>
+                                      <% }); %>
+                                    </ol>
+                                  </td>
+                                  <td>
+                                    <ol>
+                                      <% orderItem.products.forEach((product) => { %>
+                                        <li><%= product.quantity %></li>
+                                      <% }); %>
+                                    </ol>
+                                  </td>
+                                  <td>
+                                    <ol>
+                                      <% orderItem.products.forEach((product) => { %>
+                                        <li><%= product.subtotal %></li>
+                                      <% }); %>
+                                    </ol>
+                                  </td>
+                                  <td><%= orderItem.billTotal %></td>
+                                  <td><a href="viewdetail" class="btn btn-fill-out btn-sm">View</a></td> <!-- Button styled link -->
+                              </tr>
                           <% }); %>
-                        <% }); %>
                       <% } else { %>
-                        <tr>
-                          <td colspan="5">No orders found.</td>
-                        </tr>
+                          <tr>
+                              <td colspan="10">No orders found.</td>
+                          </tr>
                       <% } %>
                     </tbody>
                   </table>
@@ -109,7 +153,6 @@
       </div>
     </div>
   </section>
-
 </main>
 
 <%- include('../partials/bottomnav.ejs') %>

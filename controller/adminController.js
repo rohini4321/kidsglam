@@ -142,16 +142,28 @@ res.render('categoryPage',{category:categories})
 
 const createCategory = async (req, res) => {
   try {
-    console.log(`creating a category...`)
-      const { categoryName } = req.body;
-      const newCategory = new Category({ categoryName: categoryName });
-      await newCategory.save();
-      res.status(201).json(newCategory);
+    console.log(`creating a category...`);
+    let { categoryName } = req.body;
+    
+    // Capitalize the first letter and make the rest lowercase
+    categoryName = categoryName.charAt(0).toUpperCase() + categoryName.slice(1).toLowerCase();
+
+    // Check if the category already exists
+    const existingCategory = await Category.findOne({ categoryName ,isDeleted:false});
+    if (existingCategory) {
+      return res.status(400).json({ message: 'Category already exists' });
+    }
+
+    // Create a new category
+    const newCategory = new Category({ categoryName: categoryName });
+    await newCategory.save();
+    res.status(201).json(newCategory);
   } catch (error) {
-      console.error('Error creating category:', error);
-      res.status(500).json({ error: 'Server error' });
+    console.error('Error creating category:', error);
+    res.status(500).json({ error: 'Server error' });
   }
 };
+
 
 
 
@@ -213,18 +225,20 @@ const listcategory = async (req, res) => {
 
 const loadOrderPage = async (req, res) => {
   try {
-    // Fetch all orders from the database
-    const orders = await Order.find().populate('products.productId').exec();
+    // Fetch all orders from the database and populate necessary fields
+    const orders = await Order.find()
+      .populate('products.productId')
+      
 
-    const user = await Order.find().populate('userID').exec();
-    
     // Render the orderPage EJS template with orders data
-    res.render('orderManagement', { orders ,username:"",user}); // Pass the 'orders' variable to the EJS template
+    res.render('orderManagement', { orders, username: "", user: req.session.user }); // Assuming you have a user session
   } catch (error) {
     console.error('Error loading order page:', error);
     res.status(500).send('Server error');
   }
 };
+
+
 
 
 
@@ -534,7 +548,29 @@ const deleteImage = async (req, res) => {
 };
 
 
+const changeOrderStatus = async (req, res) => {
+  try {
+      const { orderId } = req.params;
+      console.log(req.params)
+      const { status } = req.body;
 
+      // Find the order by ID and update the status
+      const order = await Order.findByIdAndUpdate(
+          orderId,
+          { orderStatus: status },
+         
+      );
+
+      if (!order) {
+          return res.status(404).json({ success: false, message: 'Order not found' });
+      }
+
+      res.json({ success: true, message: 'Order status updated successfully', order });
+  } catch (error) {
+      console.error('Error updating order status:', error);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
 
 
 
@@ -562,7 +598,8 @@ module.exports={
                 deleteProduct,
                 loadEditProduct,
                 editProduct,
-                deleteImage
+                deleteImage,
+                changeOrderStatus
                 
                 
                 

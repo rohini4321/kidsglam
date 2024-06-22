@@ -190,28 +190,38 @@ const checkStock = async (req, res) => {
 
 const placeOrder = async (req, res) => {
   const { user, address, orderDetails, paymentMethod, billTotal, discount, subTotal } = req.body;
+console.log("hhhhhhh",req.body)
 
+// const productsdetail = await Products.findById(productId);
   try {
     // Create products array for the order
     const products = orderDetails.map(item => ({
       productId: item.productId,
-      productPrice: item.productPrice,
+     
       productName: item.productName,
       media: item.media,
       quantity: item.quantity,
       price: item.price,
-      subtotal: item.subtotal,
+      subtotal: item.price*item.quantity,
       cancelProduct: false,
       cancelReason: "",
       returnProduct: false,
       returnReason: "",
       productStatus: "pending"
     }));
+     let billTotal=0
+   for(i=0;i<products.length;i++)
+    {
+      billTotal+=products[i].subtotal
+    }
+
+
 
     // Create new order object
     const newOrder = new Order({
       user: req.session.user,
       products,
+      orderId:generateOrderId(),
       orderStatus: "pending",
       billTotal,
       discount,
@@ -284,7 +294,14 @@ const getAddressDetails = async (req, res) => {
 
 
 
-
+const generateOrderId = () => {
+  const digits = '0123456789';
+  let orderId= 'ORD';
+  for (let i = 0; i < 3; i++) {
+    orderId += digits[Math.floor(Math.random() * 10)];
+  }
+  return  orderId;
+};
 
 
 

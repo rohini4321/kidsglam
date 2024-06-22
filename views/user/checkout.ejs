@@ -348,7 +348,10 @@
                     }
                     return {
                         productId: product.productId._id,
-                        quantity: product.quantity
+                        quantity: product.quantity,
+                        price:product.productId.price,
+                        productName:product.productId.productName,
+                        
                     };
                 });
     

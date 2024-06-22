@@ -24,6 +24,6 @@ admin_route.post('/editproduct',adminController.editProduct);
 
 admin_route.post('/deleteimage', adminController.deleteImage)
 
-
+admin_route.post('/changestatus/:orderId',adminController.changeOrderStatus)
 
 module.exports=admin_route;

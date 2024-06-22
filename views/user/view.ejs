@@ -1,0 +1,182 @@
+<%- include('../partials/header.ejs') %>
+<%- include('../partials/topnav.ejs') %>
+
+<style>
+  body {
+    background-color: #f0f8ff; /* Light blue background for the body */
+    color: #333;
+    font-family: Arial, sans-serif;
+  }
+  .breadcrumb-wrap {
+    background-color: #e6f7ff; /* Light blue background for the breadcrumb */
+    padding: 15px 0;
+  }
+  .breadcrumb {
+    margin: 0;
+    padding: 0;
+  }
+  .breadcrumb a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  .breadcrumb span {
+    margin: 0 5px;
+  }
+  .card {
+    border: 1px solid #d1e7ff; /* Light blue border for the card */
+    background-color: #ffffff; /* White background for the card */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin: 20px 0;
+  }
+  .card-header {
+    background-color: #d1e7ff; /* Light blue background for the card header */
+    border-bottom: 1px solid #b6e0fe; /* Light blue border for the card header */
+    padding: 15px;
+    border-radius: 8px 8px 0 0;
+  }
+  .card-body {
+    padding: 20px;
+  }
+  .product-image {
+    max-width: 100px;
+    margin: 10px 0;
+  }
+  .cancel-button {
+    background-color: #ff4d4d; /* Red background for cancel button */
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 20px;
+  }
+  .cancel-button:hover {
+    background-color: #e60000; /* Darker red on hover */
+  }
+  .order-details-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  .order-details-list li {
+    margin-bottom: 20px;
+  }
+  .order-details-list h6 {
+    margin: 10px 0;
+  }
+</style>
+
+<main class="main">
+  <div class="page-header breadcrumb-wrap">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="/" rel="nofollow">Home</a>
+        <span></span> Order Details
+      </div>
+    </div>
+  </div>
+
+  <section class="pt-150 pb-150">
+    <div class="container">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Order Details</h5>
+        </div>
+        <div class="card-body">
+          <% if (order) { %>
+            <h6>Order ID: <%= order._id %></h6>
+            <p>Date: <%= new Date(order.createdOn).toDateString() %></p>
+            <p>Status: <%= order.orderStatus %></p>
+            <hr>
+            <h6>Products:</h6>
+            <ul class="order-details-list">
+              <% order.products.forEach((product, index) => { %>
+                <li>
+                  <h6>Product <%= index + 1 %></h6>
+                  <p>Name: <%= product.productName %></p>
+                  <p>Price: <%= product.price.toFixed(2) %></p>
+                  <p>Quantity: <%= product.quantity %></p>
+                  <p>Subtotal: <%= (product.price * product.quantity).toFixed(2) %></p>
+                  <% if (product.productId.image && product.productId.image.length > 0) { %>
+                    <img src="/uploads/<%= product.productId.image[0] %>" alt="<%= product.productId.name %>" class="product-image">
+                  <% } else { %>
+                    <p>No image available</p>
+                  <% } %>
+                </li>
+                <hr>
+              <% }); %>
+            </ul>
+            <h6>Grand Total: <%= order.billTotal.toFixed(2) %></h6>
+            <% if (order.orderStatus !== 'Cancelled') { %>
+              <button class="cancel-button" id="cancel-order-button">Cancel Order</button>
+            <% } else { %>
+              <p class="text-danger">This order has been cancelled.</p>
+            <% } %>
+          <% } else { %>
+            <p>No order details available.</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include('../partials/bottomnav.ejs') %>
+<%- include('../partials/footer.ejs') %>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const cancelButton = document.getElementById('cancel-order-button');
+    
+    if (cancelButton) {
+      cancelButton.addEventListener('click', function () {
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "Do you want to cancel this order?",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, cancel it!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            fetch('/cancel-order', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ orderId: '<%= order._id %>' })
+            })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.json();
+            })
+            .then(data => {
+              if (data.success) {
+                Swal.fire(
+                  'Cancelled!',
+                  'Your order has been cancelled.',
+                  'success'
+                ).then(() => {
+                  location.reload();
+                });
+              } else {
+                Swal.fire(
+                  'Failed!',
+                  'Failed to cancel the order.',
+                  'error'
+                );
+              }
+            })
+            .catch(error => {
+              console.error('There was a problem with the fetch operation:', error);
+            });
+          }
+        });
+      });
+    }
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

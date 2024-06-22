@@ -48,4 +48,5 @@ user_route.post("/checkStock",checkoutController.checkStock)
  user_route.post("/placeOrder",checkoutController.placeOrder)
 user_route.post("/getCartDetails",checkoutController. getCartDetails)
 user_route.get('/getAddressDetails/:id',checkoutController.getAddressDetails)
+user_route.get('/viewDetail',orderController.viewDetails)
 module.exports = user_route;
