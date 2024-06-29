@@ -15,6 +15,10 @@ admin_route.get('/orderPage',adminController.loadOrderPage)
 admin_route.put('/listUser/:categoryId',adminController.listcategory)
 admin_route.put('/unlistUser/:categoryId',adminController.unlistcategory)
 admin_route.delete('/deletecategory/:categoryId', adminController.deleteCategory);
+
+
+admin_route.put('/updateCategoryStatus/:categoryId',adminController.updateCategoryStatus)
+
 admin_route.put('/editcategory/:categoryId', adminController.editCategory);
 admin_route.get('/addProduct', adminController.addProduct);
 admin_route.post('/addProduct', adminController.productController);

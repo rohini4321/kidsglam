@@ -49,9 +49,11 @@ const sendMail = async (email, otp) => {
 // Function to load OTP page
 const  sendOtp = async (req, res) => {
   try {
-    const{username,email,password}=req.body;
-    const user ={username,email,password}
+    const{username,email,phonenumber,password}=req.body;
+    
+    const user ={username,email,phonenumber:phonenumber, password}
     req.session.user= user;
+    
 
     if (!email) {
       throw new Error('Email is missing in request body.');
@@ -116,11 +118,13 @@ const verifyOtp = async (req, res) => {
     }
 
     const userData = req.session.user;
+    console.log(userData)
     const passwordHash = await hashPassword(userData.password);
 
     const saveUserData = new User({
       username: userData.username,
       email: userData.email,
+      phonenumber:userData.phonenumber,
       password: passwordHash
     });
 
@@ -227,7 +231,20 @@ const loadShopPage = async (req, res) => {
     const category = await Category.find({isUnlisted : false});
     const Products = await Product.find()
     
-    res.render("ShoppingPage",{username,category,product:Products});
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 2;
+    const skip = (page - 1) * limit;
+
+    const totalProducts = await Product.countDocuments();
+    const totalPages = Math.ceil(totalProducts / limit);
+    const products = await Product.find().skip(skip).limit(limit);
+
+
+
+    res.render("ShoppingPage",{username,category,product:Products,page,
+      totalPages,
+      limit});
   } catch (error) {
     console.log('Error loading shopping page:', error.message);
     res.status(500).send('Error loading shopping page. Please try again later.', error);

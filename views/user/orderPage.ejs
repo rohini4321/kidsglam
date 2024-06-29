@@ -44,9 +44,23 @@
     .main-content .content-area {
         flex: 1;
     }
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .pagination a {
+        margin: 0 5px;
+        padding: 10px 15px;
+        border: 1px solid #007bff;
+        color: #007bff;
+        text-decoration: none;
+    }
+    .pagination a.active {
+        background-color: #007bff;
+        color: white;
+    }
 </style>
-
-<!-- Add your custom CSS styles here -->
 
 <main class="main">
   <div class="page-header breadcrumb-wrap">
@@ -135,7 +149,7 @@
                                     </ol>
                                   </td>
                                   <td><%= orderItem.billTotal %></td>
-                                  <td><a href="viewdetail" class="btn btn-fill-out btn-sm">View</a></td> <!-- Button styled link -->
+                                  <td><a href="/viewDetail?orderid=<%=orderItem._id%>" class="btn btn-fill-out btn-sm">View</a></td> <!-- Button styled link -->
                               </tr>
                           <% }); %>
                       <% } else { %>
@@ -145,6 +159,18 @@
                       <% } %>
                     </tbody>
                   </table>
+                  <!-- Pagination controls -->
+                  <div class="pagination">
+                    <% if (page > 1) { %>
+                      <a href="?page=<%= page - 1 %>&limit=<%= limit %>">Previous</a>
+                    <% } %>
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                      <a href="?page=<%= i %>&limit=<%= limit %>" class="<%= page === i ? 'active' : '' %>"><%= i %></a>
+                    <% } %>
+                    <% if (page < totalPages) { %>
+                      <a href="?page=<%= page + 1 %>&limit=<%= limit %>">Next</a>
+                    <% } %>
+                  </div>
                 </div>
               </div>
             </div>

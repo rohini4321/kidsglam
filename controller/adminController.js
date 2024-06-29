@@ -74,20 +74,30 @@ const verifyAdmin = async (req, res) => {
 
 
 
-  const loadUserManagement = async(req,res)=>{
+  const loadUserManagement = async (req, res) => {
     try {
-      console.log(`rendering usermanagement`)
+      console.log(`rendering usermanagement`);
   
-      
-
-      const userData= await User.find({isAdmin:0});
-      console.log(userData)
-      res.render('userManagement',{user:userData});
-       
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 5;
+      const skip = (page - 1) * limit;
+  
+      const totalUsers = await User.countDocuments({ isAdmin: 0 });
+      const totalPages = Math.ceil(totalUsers / limit);
+      const userData = await User.find({ isAdmin: 0 }).skip(skip).limit(limit);
+  
+      console.log(userData);
+      res.render('userManagement', {
+        user: userData,
+        page,
+        totalPages,
+        limit
+      });
     } catch (error) {
       res.status(500).send('Error loading User management page. Please try again later.');
     }
   };
+  
   
 
 
@@ -128,9 +138,24 @@ const loadCategoryPage = async (req, res) => {
   try {
   
    
-const categories = await Category.find({isDeleted:false})
-res.render('categoryPage',{category:categories})
+
+
+const page = parseInt(req.query.page) || 1;
+const limit = parseInt(req.query.limit) || 2;
+const skip = (page - 1) * limit;
+
    
+
+const total = await Category.countDocuments();
+const categories = await Category.find().skip(skip).limit(limit);
+
+res.render('categoryPage', { category:categories,total,
+  page,
+  limit,
+  totalPages: Math.ceil(total / limit),
+   });
+
+
 
   } catch (error) {
     console.log('Error loading home page:', error.message);
@@ -142,20 +167,20 @@ res.render('categoryPage',{category:categories})
 
 const createCategory = async (req, res) => {
   try {
-    console.log(`creating a category...`);
+    console.log('creating a category...');
     let { categoryName } = req.body;
     
     // Capitalize the first letter and make the rest lowercase
     categoryName = categoryName.charAt(0).toUpperCase() + categoryName.slice(1).toLowerCase();
 
     // Check if the category already exists
-    const existingCategory = await Category.findOne({ categoryName ,isDeleted:false});
+    const existingCategory = await Category.findOne({ categoryName, isDeleted: false });
     if (existingCategory) {
       return res.status(400).json({ message: 'Category already exists' });
     }
 
     // Create a new category
-    const newCategory = new Category({ categoryName: categoryName });
+    const newCategory = new Category({ categoryName });
     await newCategory.save();
     res.status(201).json(newCategory);
   } catch (error) {
@@ -171,8 +196,22 @@ const createCategory = async (req, res) => {
 const loadProductPage = async (req, res) => {
   try {
     
-    const Products = await Product.find({isUnlisted:false})
-    res.render('productpage',{product:Products })
+    // const Products = await Product.find({isUnlisted:false})
+
+
+    
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 5;
+      const skip = (page - 1) * limit;
+  
+      const totalProducts = await Product.countDocuments();
+      const totalPages = Math.ceil(totalProducts / limit);
+       const products = await Product.find().skip(skip).limit(limit);
+  
+
+    res.render('productpage',{products,page,
+      totalPages,
+      limit })
    
   } catch (error) {
     console.log('Error loading home page:', error.message);
@@ -290,26 +329,34 @@ const deleteCategory = async (req, res) => {
   }
 };
 
-
-
 const editCategory = async (req, res) => {
   try {
-      const categoryId = req.params.categoryId;
-      const { newName } = req.body;
+    const categoryId = req.params.categoryId;
+    let { newName } = req.body;
+    
+    // Capitalize the first letter and make the rest lowercase
+    newName = newName.charAt(0).toUpperCase() + newName.slice(1).toLowerCase();
 
-      // Find the category by ID in your database and update its name
-      const updatedCategory = await Category.findByIdAndUpdate(categoryId, { categoryName: newName }, { new: true });
+    // Check if the category already exists
+    const existingCategory = await Category.findOne({ categoryName: newName, _id: { $ne: categoryId }, isDeleted: false });
+    if (existingCategory) {
+      return res.status(400).json({ message: 'Category name already exists' });
+    }
 
-      if (!updatedCategory) {
-          return res.status(404).json({ message: 'Category not found' });
-      }
+    // Find the category by ID in your database and update its name
+    const updatedCategory = await Category.findByIdAndUpdate(categoryId, { categoryName: newName }, { new: true });
 
-      res.status(200).json({ message: 'Category name updated successfully', updatedCategory });
+    if (!updatedCategory) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+
+    res.status(200).json({ message: 'Category name updated successfully', updatedCategory });
   } catch (error) {
-      console.error('Error editing category:', error);
-      res.status(500).json({ message: 'Internal server error' });
+    console.error('Error editing category:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 const addProduct =async(req, res) => {
   try {
@@ -430,7 +477,7 @@ const loadEditProduct = async (req, res) => {
         const product = await Product.findById(productId);
         const categories = await Category.find({isUnlisted : false});
       
-        res.render('editProduct', { product ,categories,});
+        res.render('editProduct', { product ,categories});
 
    
   } catch (error) {
@@ -447,84 +494,67 @@ const loadEditProduct = async (req, res) => {
 
 const editProduct = async (req, res) => {
   try {
-    const processedImage =[];
+    upload(req, res, async function (err) {
+      if (err instanceof multer.MulterError) {
+        console.error(`Multer error: ${err}`);
+        return res.status(500).send("Error uploading the image");
+      } else if (err) {
+        console.error(`Unknown error: ${err}`);
+        return res.status(500).send(`Unknown error occurred: ${err.message}`);
+      }
 
-    upload(req,res,async function (err){
-      if(err instanceof multer.MulterError){
-        console.log(`Multer error: ${err}`)
-        res.status(500).send("Error uploading the image")
-        return;
-      }
-      else if(err){
-        console.log(`unknown Error: ${err}`);
-        res.status(500).send("unknown error occcurred. The Error:",err);
-        return;
-      }
-     
-      console.log(req.files)
-      try{
-        for(const file of req.files){
-          const filename =`${file.originalname}`;
-          const imagePath =path.join(
-            __dirname,
-            "..",
-            "public",
-            "uploads",
-            filename
-          );
-          // processedImage.push(filename);
-          try{
-            const imageBuffer = await sharp(file.path)
-            .resize(440,440)
+      
+      const processedImages = [];
+      for (const file of req.files) {
+        try {
+          const imageBuffer = await sharp(file.path)
+            .resize({ width: 440, height: 440 })
             .toBuffer();
-            fs.writeFileSync(imagePath,imageBuffer);
-            // console.log(imageBuffer)
-            fs.unlinkSync(file.path);
-            processedImage.push(filename);
 
+          const filename = `${Date.now()}-${file.originalname}`;
+          const imagePath = path.join(__dirname, '..', 'public', 'uploads', filename);
 
-          }
-          catch(error){
-            console.log(`Error occured while processing the image:${error}`);
-            res.status(500).send("error processing the image");
-            return;
-          }
+          fs.writeFileSync(imagePath, imageBuffer);
+          fs.unlinkSync(file.path); 
+
+          processedImages.push(filename);
+        } catch (error) {
+          console.error(`Error processing image: ${error}`);
+          return res.status(500).send(`Error processing image: ${error.message}`);
+        }
+      }
+
+      // Update product details in the database
+      const { id } = req.query;
+      const { productName, price, stock, category, description } = req.body;
+
+      try {
+        let product = await Product.findById(id);
+
+        if (!product) {
+          return res.status(404).json({ message: 'Product not found' });
         }
 
-        const productId = req.query.id;
-    const { productName, price, stock, category, description } = req.body;
+        product.productName = productName;
+        product.price = price;
+        product.stock = stock;
+        product.category = category;
+        product.description = description;
+        product.image = [...product.image, ...processedImages]; // append new images
 
-    let product = await Product.findById(productId);
+        await product.save();
 
-    if (!product) {
-        return res.status(404).json({ message: 'Product not found' });
-    }
-
-    product.productName = productName;
-    product.price = price;
-    product.stock = stock;
-    product.category = category;
-    product.description = description;
-    product.image = [...product.image,...processedImage];
-
-    await product.save();
-
-    res.redirect(`/admin/editproduct?id=${productId}`);
-      
-      
-      }catch(err){
-        console.log(`Error occured while processing the image using sharp: ${err}`);
-        res.status(500).send(`error processing image using sharp ${err.message}`);
+        res.redirect(`/admin/productPage`);
+      } catch (error) {
+        console.error(`Error updating product: ${error}`);
+        return res.status(500).json({ message: 'Internal server error' });
       }
-
-      });
-
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error(`Error in editProduct controller: ${error}`);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
-
 
 
 
@@ -578,6 +608,31 @@ const changeOrderStatus = async (req, res) => {
 
 
 
+
+
+
+const updateCategoryStatus = async (req, res) => {
+  const categoryId = req.params.categoryId;
+  const { isUnlisted } = req.body;
+  try {
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return res.status(404).json({ error: 'Category not found' });
+    }
+    category.isUnlisted = isUnlisted;
+    await category.save();
+    res.status(200).json({ message: 'Category status updated successfully' });
+  } catch (error) {
+    console.error('Error updating category status:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+
+
+
+
 module.exports={
                 loadloginpage,
                 verifyAdmin,
@@ -599,7 +654,8 @@ module.exports={
                 loadEditProduct,
                 editProduct,
                 deleteImage,
-                changeOrderStatus
+                changeOrderStatus,
+                updateCategoryStatus
                 
                 
                 

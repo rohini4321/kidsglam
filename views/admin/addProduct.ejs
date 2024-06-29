@@ -1,4 +1,4 @@
-<%- include('../partials/adminheader.ejs') %> 
+<%- include('../partials/adminheader.ejs') %>
 <div class="screen-overlay"></div>
 
 <aside class="navbar-aside" id="offcanvas_aside">
@@ -12,7 +12,7 @@
     </div>
     <nav>
         <ul class="menu-aside">
-            <li class="menu-item active">
+            <li class="menu-item ">
                 <a class="menu-link" href="/admin/homePage2"><i class="icon material-icons md-home"></i>
                     <span class="text">Dashboard</span>
                 </a>
@@ -27,7 +27,7 @@
                     <span class="text">Categories</span>
                 </a>
             </li>
-            <li class="menu-item">
+            <li class="menu-item active">
                 <a class="menu-link" href="/admin/productPage"><i class="icon material-icons md-store"></i>
                     <span class="text">Products</span>
                 </a>
@@ -53,7 +53,7 @@
             </div>
             <div class="col-lg-12">
                 <div class="card mb-4">
-                    <form action="/admin/addProduct" method="POST" enctype="multipart/form-data">
+                    <form action="/admin/addProduct" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
                         <div class="card-body">
                             <div class="mb-4">
                                 <label for="product_title" class="form-label">Product title</label>
@@ -61,19 +61,19 @@
                             </div>
                             <div class="row gx-3">
                                 <div class="col-md-4 mb-3">
-                                    <label for="product_sku" class="form-label">Price</label>
-                                    <input type="text" placeholder="Type here" name="price" class="form-control" id="product_sku" required>
+                                    <label for="product_price" class="form-label">Price</label>
+                                    <input type="number" placeholder="Type here" name="price" class="form-control" id="product_price" required min="0.01" step="0.01">
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label for="product_color" class="form-label">Stock</label>
-                                    <input type="text" name="stock" placeholder="Type here" class="form-control" id="product_color" required>
+                                    <label for="product_stock" class="form-label">Stock</label>
+                                    <input type="number" name="stock" placeholder="Type here" class="form-control" id="product_stock" required min="1" step="1">
                                 </div>
                             </div>
                             <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
-                                <select class="form-select" name="category">
-                                    <option selected>Select category</option>
-                                    <% categories.forEach((cat)=> { %>
-                                    <option><%= cat.categoryName %></option>
+                                <select class="form-select" name="category" required>
+                                    <option selected disabled>Select category</option>
+                                    <% categories.forEach((cat) => { %>
+                                        <option value="<%= cat.categoryName %>"><%= cat.categoryName %></option>
                                     <% }) %>
                                 </select>
                             </div>
@@ -134,5 +134,32 @@
                 reader.readAsDataURL(file);
             }
         }
+    }
+
+    function validateForm() {
+        const price = document.getElementById('product_price').value;
+        const stock = document.getElementById('product_stock').value;
+
+        if (price <= 0) {
+            Swal.fire({
+                title: 'Error',
+                text: 'Price must be a positive value',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+
+        if (stock <= 0) {
+            Swal.fire({
+                title: 'Error',
+                text: 'Stock must be a positive value',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+
+        return true;
     }
 </script>

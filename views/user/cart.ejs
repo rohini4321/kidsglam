@@ -1,5 +1,5 @@
-<%-include('../partials/header.ejs')%>
-<%-include('../partials/topnav.ejs')%>
+<%- include('../partials/header.ejs') %>
+<%- include('../partials/topnav.ejs') %>
 
 <main class="main">
     <div class="page-header breadcrumb-wrap">
@@ -17,7 +17,6 @@
                 <div class="col-12">
                     <div class="table-responsive">
                         <% if (products.length > 0) { %>
-                        
                         <table class="table shopping-summery text-center clean">
                             <thead>
                                 <tr class="main-heading">
@@ -30,44 +29,35 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                    <% products.forEach(product => { %>
-                                    <tr>
-                                        <td class="image product-thumbnail"><img src="/uploads/<%= product.productId.image[0] %>" alt="<%= product.productName %>" style="max-width: 100px;"></td>
-                                        <td class="product-name"><a href="/singleproduct?id=<%= product.productId._id %>"><%= product.productId.productName %></a></td>
-                                        <td class="price" data-title="Price">Rs. <%= product.productId.price %></td>
-                                        <td class="qty" data-title="Quantity">
-                                            <div class="quantity-control">
-                                                <button class="decrease-quantity" data-id="<%= product.productId._id %>">-</button>
-                                                <span class="quantity-value"><%= product.quantity %></span>
-                                                <button class="increase-quantity" data-id="<%= product.productId._id %>">+</button>
-                                            </div>
-                                        </td>
-                                        <td class="subtotal" data-title="Subtotal">Rs. <%= product.productId.price * product.quantity %></td>
-                                        <td class="action" data-title="Remove">
-                                            <a href="#" class="remove-product" data-id="<%= product.productId._id %>">
-                                                <i class="fi-rs-trash"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <% }) %>
-                                
+                                <% products.forEach(product => { %>
                                 <tr>
-                                    <td colspan="6" class="text-end">
-                                        <a href="#" class="text-muted"> <i class="fi-rs-cross-small"></i> Clear Cart</a>
+                                    <td class="image product-thumbnail"><img src="/uploads/<%= product.productId.image[0] %>" alt="<%= product.productName %>" style="max-width: 100px;"></td>
+                                    <td class="product-name"><a href="/singleproduct?id=<%= product.productId._id %>"><%= product.productId.productName %></a></td>
+                                    <td class="price" data-title="Price">Rs. <%= product.productId.price %></td>
+                                    <td class="qty" data-title="Quantity">
+                                        <div class="quantity-control">
+                                            <button class="decrease-quantity" data-id="<%= product.productId._id %>">-</button>
+                                            <span class="quantity-value"><%= product.quantity %></span>
+                                            <button class="increase-quantity" data-id="<%= product.productId._id %>">+</button>
+                                        </div>
+                                    </td>
+                                    <td class="subtotal" data-title="Subtotal">Rs. <%= product.productId.price * product.quantity %></td>
+                                    <td class="action" data-title="Remove">
+                                        <a href="#" class="remove-product" data-id="<%= product.productId._id %>">
+                                            <i class="fi-rs-trash"></i>
+                                        </a>
                                     </td>
                                 </tr>
+                                <% }) %>
                                 
                             </tbody>
                         </table>
                         <% } else { %>
-                            <tr>
-                                <td colspan="6" class="text-center">Your cart is empty.</td>
-                            </tr>
+                        <div class="text-center">Your cart is empty.</div>
                         <% } %>
                     </div>
-                    
-                    <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
                     <% if (products.length > 0) { %>
+                    <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
                     <div class="row mb-50">
                         <div class="col-lg-6 col-md-12">
                             <div class="border p-md-4 p-30 border-radius cart-totals">
@@ -75,24 +65,22 @@
                                     <h4>Cart Totals</h4>
                                 </div>
                                 <div class="table-responsive">
-                                    <div class="table-responsive">
-                                        <table class="table">
-                                            <tbody>
-                                                <tr>
-                                                    <td class="cart_total_label">Cart Subtotal</td>
-                                                    <td class="cart_total_amount"><span id="cart-subtotal" class="font-lg fw-900 text-brand">Rs. 0.00</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="cart_total_label">Shipping</td>
-                                                    <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free Shipping</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="cart_total_label">Total</td>
-                                                    <td class="cart_total_amount"><strong><span id="cart-total" class="font-xl fw-900 text-brand">Rs. 0.00</span></strong></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td class="cart_total_label">Cart Subtotal</td>
+                                                <td class="cart_total_amount"><span id="cart-subtotal" class="font-lg fw-900 text-brand">Rs. 0.00</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="cart_total_label">Shipping</td>
+                                                <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free Shipping</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="cart_total_label">Total</td>
+                                                <td class="cart_total_amount"><strong><span id="cart-total" class="font-xl fw-900 text-brand">Rs. 0.00</span></strong></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                                 <a href="/checkoutPage" class="btn"><i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
                             </div>
@@ -104,9 +92,10 @@
         </div>
     </section>
 </main>
-<%-include('../partials/bottomnav.ejs')%>
-<%-include('../partials/footer.ejs')%>
+<%- include('../partials/bottomnav.ejs') %>
+<%- include('../partials/footer.ejs') %>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Function to update the cart totals
@@ -118,7 +107,7 @@
             document.getElementById('cart-subtotal').textContent = 'Rs. ' + subtotal.toFixed(2);
             document.getElementById('cart-total').textContent = 'Rs. ' + subtotal.toFixed(2);
         }
-    
+
         // Event listener for increasing quantity
         document.querySelectorAll('.increase-quantity').forEach(button => {
             button.addEventListener('click', function () {
@@ -128,7 +117,7 @@
                 updateQuantity(productId, quantity + 1, quantityElement);
             });
         });
-    
+
         // Event listener for decreasing quantity
         document.querySelectorAll('.decrease-quantity').forEach(button => {
             button.addEventListener('click', function () {
@@ -140,14 +129,14 @@
                 }
             });
         });
-    
+
         // Event listener for removing a product
         document.querySelectorAll('.remove-product').forEach(button => {
             button.addEventListener('click', function (event) {
                 event.preventDefault();
                 let productId = this.getAttribute('data-id');
                 let row = this.closest('tr');
-    
+
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this!",
@@ -163,7 +152,7 @@
                 });
             });
         });
-    
+
         // Function to update the quantity of a product
         function updateQuantity(productId, newQuantity, quantityElement) {
             // Ensure the quantity does not exceed 5
@@ -175,7 +164,7 @@
                 });
                 return;
             }
-    
+
             // Update the quantity displayed in the UI
             quantityElement.textContent = newQuantity;
             
@@ -184,13 +173,7 @@
             let price = parseFloat(row.querySelector('.price').textContent.replace('Rs. ', ''));
             let subtotalElement = row.querySelector('.subtotal');
             subtotalElement.textContent = 'Rs. ' + (price * newQuantity).toFixed(2);
-    
-            // Log details for debugging
-            console.log("Product ID:", productId);
-            console.log("New Quantity:", newQuantity);
-            console.log("Price:", price);
-            console.log("Subtotal Element:", subtotalElement);
-    
+
             // Send a request to update the quantity in the database
             fetch(`/updatequantity`, {
                 method: 'POST',
@@ -217,7 +200,7 @@
                 console.error('There was a problem with the fetch operation:', error);
             });
         }
-    
+
         // Function to remove a product from the cart
         function removeProduct(productId, row) {
             fetch(`/remove-from-cart`, {
@@ -235,11 +218,15 @@
                 if (data.success) {
                     row.remove();
                     updateCartTotals(); // Recalculate the cart totals
-                    Swal.fire(
-                        'Removed!',
-                        'The product has been removed from your cart.',
-                        'success'
-                    );
+                    Swal.fire({
+                title: 'Removed!',
+                text: 'The product has been removed from your cart.',
+                icon: 'success'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    location.reload();
+                }
+            });
                     if (document.querySelectorAll('tbody tr').length === 1) {
                         location.reload();
                     }
@@ -254,9 +241,8 @@
                 console.error('There was a problem with the fetch operation:', error);
             });
         }
-    
+
         // Initial calculation of cart totals
         updateCartTotals();
     });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</script>

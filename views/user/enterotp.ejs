@@ -1,0 +1,163 @@
+<%- include('../partials/header.ejs') %>
+<%- include('../partials/topnav.ejs') %>
+
+<main class="main">
+  <div class="page-header breadcrumb-wrap">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="index.html" rel="nofollow">Home</a>
+        <span></span> Pages
+        <span></span> Enter OTP
+      </div>
+    </div>
+  </div>
+
+  <section class="pt-75 pb-75 text-center">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-4">
+          <div class="login_wrap widget-taber-content p-30 background-white border-radius-5">
+            <div class="padding_eight_all bg-white">
+              <div>
+                <h3 class="mb-50">Enter OTP</h3>
+              </div>
+              <div id="timer" class="mb-3"></div>
+              <form name="enterOtpForm" method="post" action="/enterOtp" onsubmit="return validateForm()">
+                <div class="form-group">
+                  <input type="text" name="otp" placeholder="Enter OTP">
+                  <div id="otpError" class="error-message"></div>
+                </div>
+                <div class="form-group">
+                  <button id="submitBtn" type="submit" class="btn btn-fill-out btn-block hover-up">Submit OTP</button>
+                </div>
+              </form>
+              <div class="text-muted">Didn't receive the OTP? <button id="resendOtpBtn" class="disabled">Resend OTP</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<script>
+  function validateForm() {
+    var otp = document.forms["enterOtpForm"]["otp"].value;
+    var otpError = document.getElementById("otpError");
+
+    // Resetting error messages
+    otpError.innerText = "";
+
+    // Validating OTP
+    if (otp == "") {
+      otpError.innerText = "Please enter the OTP.";
+      return false;
+    } else if (!/^\d{6}$/.test(otp)) {
+      otpError.innerText = "OTP should be a 6-digit number.";
+      return false;
+    }
+
+    return true; // Form is valid
+  }
+
+  // Timer function
+  function startTimer(duration, display, resendBtn) {
+    var timer = duration, minutes, seconds;
+    var interval = setInterval(function () {
+      minutes = parseInt(timer / 60, 10);
+      seconds = parseInt(timer % 60, 10);
+
+      minutes = minutes < 10 ? "0" + minutes : minutes;
+      seconds = seconds < 10 ? "0" + seconds : seconds;
+
+      display.textContent = "Time remaining: " + minutes + ":" + seconds;
+
+      if (--timer < 0) {
+        clearInterval(interval);
+        display.textContent = "OTP expired, please request a new one.";
+        document.getElementById("submitBtn").disabled = true; // Disable the submit button
+        resendBtn.classList.remove('disabled'); // Enable the resend button
+        resendBtn.disabled = false; // Enable the resend button
+      }
+    }, 1000);
+  }
+
+  window.onload = function () {
+    var timerDuration = 60; // Duration in seconds
+    var display = document.getElementById('timer');
+    var resendBtn = document.getElementById('resendOtpBtn');
+    resendBtn.classList.add('disabled'); // Initially disable the resend button
+    resendBtn.disabled = true; // Initially disable the resend button
+    startTimer(timerDuration, display, resendBtn);
+  };
+
+  // Handle resend OTP button click
+  document.getElementById('resendOtpBtn').addEventListener('click', function() {
+    fetch('/fpResendOtp', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    }).then(response => {
+      if (response.ok) {
+        alert('OTP has been resent to your email.');
+        location.reload(); // Reload the page to restart the timer
+      } else {
+        alert('Failed to resend OTP. Please try again.');
+      }
+    }).catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred. Please try again.');
+    });
+  });
+
+  // Handle OTP form submission
+  document.forms["enterOtpForm"].onsubmit = function(event) {
+    event.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    const otp = document.forms["enterOtpForm"]["otp"].value;
+
+    fetch('/enterOtp', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ otp })
+    }).then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Swal.fire({
+          //   icon: 'success',
+          //   title: 'Success',
+          //   text: data.message,
+          //   onClose: () => {
+              window.location.href = '/resetPassword'; // Redirect to new password page
+          //   }
+          // });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.message
+          });
+        }
+      }).catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'An error occurred. Please try again.'
+        });
+      });
+  };
+</script>
+
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<%- include('../partials/bottomnav.ejs') %>
+<%- include('../partials/footer.ejs') %>

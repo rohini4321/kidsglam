@@ -1,5 +1,22 @@
 <%- include('../partials/adminheader.ejs') %> 
-
+<style>
+     .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .pagination a {
+        margin: 0 5px;
+        padding: 10px 15px;
+        border: 1px solid #007bff;
+        color: #007bff;
+        text-decoration: none;
+    }
+    .pagination a.active {
+        background-color: #007bff;
+        color: white;
+    }
+</style>
 <body>
     <div class="screen-overlay"></div>
     
@@ -23,27 +40,22 @@
                   <a class="menu-link" href="/admin/userManagement"> <i class="icon material-icons md-shopping_bag"></i>
                       <span class="text">User Management</span>
                   </a>
-                  
               </li>
               <li class="menu-item active ">
                   <a class="menu-link" href="/admin/categoryPage"> <i class="icon material-icons md-shopping_cart"></i>
                       <span class="text">Categories</span>
                   </a>
-                  
               </li>
               <li class="menu-item ">
                   <a class="menu-link" href="/admin/productPage"> <i class="icon material-icons md-store"></i>
                       <span class="text">Products</span>
                   </a> 
-                  
               </li>
               <li class="menu-item ">
                   <a class="menu-link" href="/admin/orderPage"> <i class="icon material-icons md-add_box"></i>
                       <span class="text">Orders</span>
                   </a>
-                  
               </li>
-              </ul>
           </ul>
           <br>
           <br>
@@ -66,10 +78,6 @@
                     </datalist>
                 </form>
             </div>
-            
-                 
-                    
-            </div>
         </header>
         <section class="content-main">
             <div class="content-header">
@@ -86,19 +94,14 @@
                     <div class="row">
                         <div class="col-md-3">
                             <form>
-                              <div class="col-md-15">
-                                <form method="post" action="/categoryPage">
-                                    <div class="mb-4">
-                                        <label for="product_name" class="form-label">Name</label>
-                                        <input type="text" placeholder="Type here" class="form-control" id="category_name" name="categoryName" />
-                                    </div>
-                                    <div class="d-grid">
-                                        <button id="createCategoryForm" type="submit" class="btn btn-primary">Create category</button>
-                                    </div>
-                                </form>
-                            </div>
-
-
+                                <div class="mb-4">
+                                  <label for="category_name" class="form-label">Name</label>
+                                  <input type="text" placeholder="Type here" class="form-control" id="category_name" name="categoryName" />
+                                </div>
+                                <div class="d-grid">
+                                  <button id="createCategoryForm" type="submit" class="btn btn-primary">Create category</button>
+                                </div>
+                            </form>
                         </div>
                         <div class="col-md-9">
                             <div class="table-responsive">
@@ -125,21 +128,14 @@
                                                         <% } %>
                                                     </td>
                                                     <td>
-                                                        <!-- Inside the loop where categories are displayed -->
-<button type="button" class="btn btn-primary" onclick="showEditModal('<%= category[i]._id %>', '<%= category[i].categoryName %>')">Edit</button>
-
+                                                        <button type="button" class="btn btn-primary" onclick="showEditModal('<%= category[i]._id %>', '<%= category[i].categoryName %>')">Edit</button>
                                                     </td>
                                                     <td>
                                                         <% if(category[i].isUnlisted) { %>
-                                                            <button type="button" class="btn btn-success" onclick="confirmlist('<%= category[i]._id %>')">List</button>
+                                                            <button type="button" class="btn btn-success" onclick="updateCategoryStatus('<%= category[i]._id %>', false)">List</button>
                                                         <% } else { %>
-                                                            <button type="button" class="btn btn-warning" onclick="confirmUnlist('<%= category[i]._id %>')">Unlist</button>
+                                                            <button type="button" class="btn btn-warning" onclick="updateCategoryStatus('<%= category[i]._id %>', true)">Unlist</button>
                                                         <% } %>
-                                                    </td>
-                                                    
-                                                    <td>
-                                                        <button type="button" class="btn btn-danger" onclick="confirmDelete('<%= category[i]._id %>')">Delete</button>
-
                                                     </td>
                                                 </tr>
                                             <% } %>
@@ -148,260 +144,162 @@
                                                 <td colspan="6">Categories Not Found</td>
                                             </tr>
                                         <% } %>
-                                        
-                                       
-                                        
-
-
-
-
-
                                     </tbody>
-                                    
-                                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                                    <script>
-                                      // Add an event listener to the form submission event
-                                      document.getElementById('createCategoryForm').addEventListener('click', function(event) {
-                                        // Prevent the default form submission behavior
-                                        event.preventDefault();
-                                        
-                                        // Gather the category data from the form fields
-                                        const categoryName = document.getElementById('category_name').value;
-                                        console.log(categoryName);
-                                    
-                                        // Send an HTTP POST request to your backend API endpoint
-                                        fetch('/admin/categoryPage', {
-                                          method: 'POST',
-                                          headers: {
-                                            'Content-Type': 'application/json'
-                                          },
-                                          body: JSON.stringify({ categoryName: categoryName }) // Send category name in the request body
-                                        })
-                                        .then(response => {
-                                          if (response.ok) {
-                                            return response.json(); // Parse JSON response
-                                          } else if (response.status === 400) {
-                                            throw new Error('Category already exists');
-                                          } else {
-                                            throw new Error('Failed to create category');
-                                          }
-                                        })
-                                        .then(data => {
-                                          // Handle successful response
-                                          console.log('Category created successfully:', data);
-                                          Swal.fire({
-                                            title: 'Success!',
-                                            text: 'Category created successfully.',
-                                            icon: 'success',
-                                            confirmButtonText: 'OK'
-                                          }).then(() => {
-                                            window.location.reload(); // Reload the page
-                                          });
-                                        })
-                                        .catch(error => {
-                                          // Handle errors
-                                          console.error('Error creating category:', error);
-                                          Swal.fire({
-                                            title: 'Error',
-                                            text: error.message,
-                                            icon: 'error',
-                                            confirmButtonText: 'OK'
-                                          });
-                                        });
-                                      });
-                                    
-                                    
-                                        
-                                          
-    function confirmUnlist(categoryId) {
-        Swal.fire({
-            title: "Are you sure?",
-            text: "Once unlisted, you will need to relist the category manually!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "Yes, unlist it!",
-            cancelButtonText: "No, cancel!",
-            closeOnConfirm: false,
-            closeOnCancel: false
-        }).then((result) => {
-            console.log(result.isConfirmed)
-            if (result.isConfirmed) {
-                // Perform the unlisting action here, for example, send an AJAX request to your backend
-                fetch(`/admin/listUser/${categoryId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ isUnlisted: true })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        console.log("Category unlisted successfully");
-                        return response.json();
-                    } else {
-                        throw new Error("Failed to unlist category");
-                    }
-                })
-                .then(data => {
-                    console.log(data);
-                    Swal.fire("Unlisted!", "Your category has been unlisted.", "success");
-                    location.reload();
-                })
-                .catch(error => {
-                    console.error("Error unlisting category:", error);
-                    Swal.fire("Error", "Failed to unlist the category. Please try again later.", "error");
-                });
-            } else {
-                Swal.fire("Cancelled", "Your category is safe :)", "error");
-            }
+                                </table>
+                            </div>
+                            <div class="pagination">
+                              <% if (page > 1) { %>
+                                <a href="?page=<%= page - 1 %>&limit=<%= limit %>">Previous</a>
+                              <% } %>
+                              <% for (let i = 1; i <= totalPages; i++) { %>
+                                <a href="?page=<%= i %>&limit=<%= limit %>" class="<%= page === i ? 'active' : '' %>"><%= i %></a>
+                              <% } %>
+                              <% if (page < totalPages) { %>
+                                <a href="?page=<%= page + 1 %>&limit=<%= limit %>">Next</a>
+                              <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      document.getElementById('createCategoryForm').addEventListener('click', function(event) {
+        event.preventDefault();
+        
+        const categoryName = document.getElementById('category_name').value;
+        console.log(categoryName);
+
+        fetch('/admin/categoryPage', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ categoryName })
+        })
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          } else if (response.status === 400) {
+            throw new Error('Category already exists');
+          } else {
+            throw new Error('Failed to create category');
+          }
+        })
+        .then(data => {
+          console.log('Category created successfully:', data);
+          Swal.fire({
+            title: 'Success!',
+            text: 'Category created successfully.',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          }).then(() => {
+            window.location.reload();
+          });
+        })
+        .catch(error => {
+          console.error('Error creating category:', error);
+          Swal.fire({
+            title: 'Error',
+            text: error.message,
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
         });
-    }
+      });
 
-
-    function confirmlist(categoryId) {
+      function showEditModal(categoryId, currentName) {
         Swal.fire({
-            title: "Are you sure?",
-            text: "Once listed, you will need to relist the category manually!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "Yes, list it!",
-            cancelButtonText: "No, cancel!",
-            closeOnConfirm: false,
-            closeOnCancel: false
-        }).then((result) => {
-            console.log(result.isConfirmed)
-            if (result.isConfirmed) {
-                // Perform the unlisting action here, for example, send an AJAX request to your backend
-                fetch(`/admin/unlistUser/${categoryId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ isUnlisted: false })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        console.log("Category listed successfully");
-                        return response.json();
-                    } else {
-                        throw new Error("Failed to list category");
-                    }
-                })
-                .then(data => {
-                    console.log(data);
-                    Swal.fire("Unlisted!", "Your category has been listed.", "success");
-                    location.reload();
-                })
-                .catch(error => {
-                    console.error("Error unlisting category:", error);
-                    Swal.fire("Error", "Failed to unlist the category. Please try again later.", "error");
-                });
+          title: 'Edit Category',
+          input: 'text',
+          inputValue: currentName,
+          inputAttributes: {
+            autocapitalize: 'off'
+          },
+          showCancelButton: true,
+          confirmButtonText: 'Save',
+          showLoaderOnConfirm: true,
+          preConfirm: (newName) => {
+            if (!newName) {
+              Swal.showValidationMessage('Please enter a new name');
             } else {
-                Swal.fire("Cancelled", "Your category is safe :)", "error");
-            }
-        });
-    }
-
-    
-    function confirmDelete(categoryId) {
-        Swal.fire({
-            title: "Are you sure?",
-            text: "Once deleted, you will not be able to recover this category!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "Yes, delete it!",
-            cancelButtonText: "No, cancel!",
-            closeOnConfirm: false,
-            closeOnCancel: false
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Send an HTTP DELETE request to delete the category
-                fetch(`/admin/deletecategory/${categoryId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => {
-                    if (response.ok) {
-                        console.log("Category deleted successfully");
-                        return response.json();
-                    } else {
-                        throw new Error("Failed to delete category");
-                    }
-                })
-                .then(data => {
-                    console.log(data);
-                    Swal.fire("Deleted!", "Your category has been deleted.", "success");
-                    window.location.reload(); // Reload the page
-                })
-                .catch(error => {
-                    console.error("Error deleting category:", error);
-                    Swal.fire("Error", "Failed to delete the category. Please try again later.", "error");
-                });
-            } else {
-                Swal.fire("Cancelled", "Your category is safe :)", "error");
-            }
-        });
-    }
-
-
-    
-    function showEditModal(categoryId, currentName) {
-        Swal.fire({
-            title: 'Edit Category',
-            input: 'text',
-            inputValue: currentName,
-            inputAttributes: {
-                autocapitalize: 'off'
-            },
-            showCancelButton: true,
-            confirmButtonText: 'Save',
-            showLoaderOnConfirm: true,
-            preConfirm: (newName) => {
-                if (!newName) {
-                    Swal.showValidationMessage('Please enter a new name');
-                } else {
-                    // Send request to backend to update category name
-                    return fetch(`/admin/editcategory/${categoryId}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ newName: newName })
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Failed to update category');
-                        }
-                        return response.json();
-                    })
-                    .catch(error => {
-                        Swal.showValidationMessage(`Request failed: ${error}`);
-                    });
+              return fetch(`/admin/editcategory/${categoryId}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ newName })
+              })
+              .then(response => {
+                if (response.status === 400) {
+                  throw new Error('Category name already exists');
+                } else if (!response.ok) {
+                  throw new Error('Failed to update category');
                 }
-            },
-            allowOutsideClick: () => !Swal.isLoading()
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire(
-                    'Saved!',
-                    'Category name has been updated.',
-                    'success'
-                );
-                // Reload the page or update UI as needed
-                window.location.reload();
+                return response.json();
+              })
+              .catch(error => {
+                Swal.showValidationMessage(`Request failed: ${error.message}`);
+              });
             }
+          },
+          allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire(
+              'Saved!',
+              'Category name has been updated.',
+              'success'
+            );
+            window.location.reload();
+          }
         });
-    }
-</script>
+      }
 
-
-
-
-
-
-</script>
+      function updateCategoryStatus(categoryId, isUnlisted) {
+        const action = isUnlisted ? 'unlist' : 'list';
+        Swal.fire({
+          title: `Are you sure you want to ${action} this category?`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes',
+          cancelButtonText: 'No'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            fetch(`/admin/updateCategoryStatus/${categoryId}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ isUnlisted })
+            })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to update category status');
+              }
+              return response.json();
+            })
+            .then(data => {
+              Swal.fire(
+                'Updated!',
+                'Category status has been updated.',
+                'success'
+              );
+              window.location.reload();
+            })
+            .catch(error => {
+              console.error('Error updating category status:', error);
+              Swal.fire({
+                title: 'Error',
+                text: error.message,
+                icon: 'error',
+                confirmButtonText: 'OK'
+              });
+            });
+          }
+        });
+      }
+    </script>
+</body>

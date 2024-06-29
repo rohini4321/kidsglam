@@ -98,7 +98,7 @@
                                 <% orders.forEach((order, index) => { %>
                                     <tr>
                                         <td><%= index + 1 %></td>
-                                        <td><%= order._id %></td>
+                                        <td><%= order.orderId %></td>
                                         <td>
                                             <% order.products.forEach((product, idx) => { %>
                                                 <%= product.productName %><br>
@@ -130,9 +130,12 @@
                                         </td>
                                         <td><%= order.billTotal %></td>
                                         <td class="text-end">
+                                           <% if(order.orderStatus!= "Delivered"){ %>
+                                           
                                             <button class="btn btn-light rounded btn-sm change-status-btn" data-order-id="<%= order._id %>">
                                                 Change Status
                                             </button>
+                                            <% } %>
                                         </td>
                                     </tr>
                                 <% }); %>
@@ -156,7 +159,6 @@
         </section>
     </main>
 <%- include('../partials/footer.ejs') %>
-
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -200,7 +202,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(data => {
                         if (data.success) {
                             document.getElementById(`status-${orderId}`).innerText = status;
-                            Swal.fire('Success', 'Order status updated', 'success');
+                            Swal.fire('Success', 'Order status updated', 'success')
+                            .then(() => {
+                                if (status === 'Delivered') {
+                                    location.reload();
+                                }
+                            });
                         } else {
                             Swal.fire('Error', 'Failed to update order status', 'error');
                         }

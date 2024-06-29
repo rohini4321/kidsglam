@@ -2,6 +2,8 @@ const User = require("../models/userDataModel");
 const Cart = require("../models/cartModel")
 const Products = require("../models/productDataModel")
 const Order = require("../models/orderModel")
+
+
 const loadCheckoutPage = async (req, res) => {
   try {
 

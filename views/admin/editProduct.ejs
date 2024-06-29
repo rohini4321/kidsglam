@@ -12,7 +12,7 @@
     </div>
     <nav>
         <ul class="menu-aside">
-            <li class="menu-item active">
+            <li class="menu-item ">
                 <a class="menu-link" href="/admin/homePage2"><i class="icon material-icons md-home"></i>
                     <span class="text">Dashboard</span>
                 </a>
@@ -27,7 +27,7 @@
                     <span class="text">Categories</span>
                 </a>
             </li>
-            <li class="menu-item">
+            <li class="menu-item active">
                 <a class="menu-link" href="/admin/productPage"><i class="icon material-icons md-store"></i>
                     <span class="text">Products</span>
                 </a>
@@ -73,7 +73,7 @@
                                 <select class="form-select" name="category">
                                     <option selected>Select category</option>
                                     <% categories.forEach((cat) => { %>
-                                        <option value="<%= cat._id %>" <%= product.category == cat._id ? 'selected' : '' %>><%= cat.categoryName %></option>
+                                        <option value="<%= cat.categoryName %>" <%= product.category == cat._id ? 'selected' : '' %>><%= cat.categoryName %></option>
                                     <% }) %>
                                 </select>
                             </div>
@@ -119,30 +119,39 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    function previewImages(event) {
-        const imagePreview = document.getElementById('image-preview');
-        imagePreview.innerHTML = ''; // Clear any existing previews
+   function previewImages(event) {
+    const imagePreview = document.getElementById('image-preview');
+    imagePreview.innerHTML = ''; // Clear any existing previews
 
-        const files = event.target.files;
+    const files = event.target.files;
+    const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
-        if (files) {
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const reader = new FileReader();
+    if (files) {
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
 
-                reader.onload = function(e) {
-                    const imgElement = document.createElement('img');
-                    imgElement.src = e.target.result;
-                    imgElement.style.maxWidth = '150px';
-                    imgElement.style.maxHeight = '150px';
-                    imgElement.style.margin = '5px';
-                    imagePreview.appendChild(imgElement);
-                }
-
-                reader.readAsDataURL(file);
+            if (!validImageTypes.includes(file.type)) {
+                Swal.fire('Invalid File Type', 'Please select an image file (jpeg, png, gif, webp).', 'error');
+                event.target.value = ''; // Clear the input
+                imagePreview.innerHTML = ''; // Clear the preview
+                return;
             }
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const imgElement = document.createElement('img');
+                imgElement.src = e.target.result;
+                imgElement.style.maxWidth = '150px';
+                imgElement.style.maxHeight = '150px';
+                imgElement.style.margin = '5px';
+                imagePreview.appendChild(imgElement);
+            }
+
+            reader.readAsDataURL(file);
         }
     }
+}
 
     function deleteImage(index, productid, image) {
         // Find the image div containing the image and the button
